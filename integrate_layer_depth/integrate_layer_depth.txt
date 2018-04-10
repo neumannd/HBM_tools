@@ -1,0 +1,8 @@
+first version run time for 5 time steps:
+
+* with OpenMP: 5 hours
+* no OpenMP: stopped after 8 hours; predicted to run 16-17 hours
+
+
+
+
