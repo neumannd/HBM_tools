@@ -32,9 +32,6 @@ wiOpenMP: integrate_layer_depth.f90
 noOpenMP: integrate_layer_depth.f90
 	$(FC) integrate_layer_depth.f90 -o integrate_layer_depth_noOpenMP.x $(FCFLAGS) $(LDFLAGS) $(LIBS)
 
-version: netcdf_version.f90
-	$(FC) netcdf_version.f90  -o netcdf_version.x $(FCFLAGS) $(LDFLAGS) $(LIBS)
-
 old.20180408: integrate_layer_depth.old.v01.20180408.f90
 	$(FC) integrate_layer_depth.old.v01.20180408.f90 -o integrate_layer_depth.old.v01.20180408_wiOpenMP.x -fopenmp $(FCFLAGS) $(LDFLAGS) $(LIBS)
 
