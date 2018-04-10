@@ -17,20 +17,20 @@ LIBS=-lnetcdff -lnetcdf -lhdf5_hl -lhdf5 -lz -lm
 ## use
 # module load intel.studio/16.0.3.210
 
-all: integrate_layer_depth.x
+all: calc_grid_cell_size.x
 	echo "doing all"
 
-integrate_layer_depth.x: integrate_layer_depth.o
-	$(FC) integrate_layer_depth.o -o integrate_layer_depth.x $(LDFLAGS) $(LIBS)
+calc_grid_cell_size.x: calc_grid_cell_size.o
+	$(FC) calc_grid_cell_size.o -o calc_grid_cell_size.x $(LDFLAGS) $(LIBS)
 
-integrate_layer_depth.o: integrate_layer_depth.f90
-	$(FC) integrate_layer_depth.f90 -c $(FCFLAGS) -o integrate_layer_depth.o
+calc_grid_cell_size.o: calc_grid_cell_size.f90
+	$(FC) calc_grid_cell_size.f90 -c $(FCFLAGS) -o calc_grid_cell_size.o
 
-wiOpenMP: integrate_layer_depth.f90
-	$(FC) integrate_layer_depth.f90 -o integrate_layer_depth_wiOpenMP.x -qopenmp $(FCFLAGS) $(LDFLAGS) $(LIBS)
+wiOpenMP: calc_grid_cell_size.f90
+	$(FC) calc_grid_cell_size.f90 -o calc_grid_cell_size_wiOpenMP.x -fopenmp $(FCFLAGS) $(LDFLAGS) $(LIBS)
 
-noOpenMP: integrate_layer_depth.f90
-	$(FC) integrate_layer_depth.f90 -o integrate_layer_depth_noOpenMP.x $(FCFLAGS) $(LDFLAGS) $(LIBS)
+noOpenMP: calc_grid_cell_size.f90
+	$(FC) calc_grid_cell_size.f90 -o calc_grid_cell_size_noOpenMP.x $(FCFLAGS) $(LDFLAGS) $(LIBS)
 
 clean:
 	rm *.x *.o
