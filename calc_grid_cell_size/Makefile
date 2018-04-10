@@ -1,0 +1,33 @@
+HDF_ROOT=/media/neumannd/sw/linux/packages/hdf5/hdf5-1.8.18/gcc-5.4.0/noMPI
+HDF_LIB=$(HDF_ROOT)/lib
+HDF_INC=$(HDF_ROOT)/include
+NETCDF_ROOT=/media/neumannd/sw/linux/packages/netcdf/netcdf-4.4.1.1/gcc-5.4.0/noMPI
+NETCDF_LIB=$(NETCDF_ROOT)/lib
+NETCDF_INC=$(NETCDF_ROOT)/include
+
+FC=gfortran-5
+FCFLAGS=-g -I$(HDF_INC) -I$(NETCDF_INC) -Wl,-rpath,$(NETCDF_LIB) -Wl,-rpath,$(HDF_LIB)
+LDFLAGS=-g -L$(HDF_LIB) -L$(NETCDF_LIB) -Wl,-rpath,$(NETCDF_LIB) -Wl,-rpath,$(HDF_LIB)
+LIBS=-lnetcdff -lnetcdf -lhdf5_hl -lhdf5 -lz -lm
+# not used
+# -g debug
+# -std=f2003 
+# -fopenmp
+
+all: calc_grid_cell_size.x
+	echo "doing all"
+
+calc_grid_cell_size.x: calc_grid_cell_size.o
+	$(FC) calc_grid_cell_size.o -o calc_grid_cell_size.x $(LDFLAGS) $(LIBS)
+
+calc_grid_cell_size.o: calc_grid_cell_size.f90
+	$(FC) calc_grid_cell_size.f90 -c $(FCFLAGS) -o calc_grid_cell_size.o
+
+wiOpenMP: calc_grid_cell_size.f90
+	$(FC) calc_grid_cell_size.f90 -o calc_grid_cell_size_wiOpenMP.x -fopenmp $(FCFLAGS) $(LDFLAGS) $(LIBS)
+
+noOpenMP: calc_grid_cell_size.f90
+	$(FC) calc_grid_cell_size.f90 -o calc_grid_cell_size_noOpenMP.x $(FCFLAGS) $(LDFLAGS) $(LIBS)
+
+clean:
+	rm *.x *.o
