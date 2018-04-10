@@ -62,6 +62,7 @@ program intergrate_layer_depth
   
   
   !! ~~~~~ READ OLD DATA ~~~~~
+  write(*,*) '~~~~ READING file '//file_in 
   ! OPEN FILE
   nf_stat = NF90_OPEN(file_in, NF90_NOWRITE, ncid_in)
   call nf90_check_error(nf_stat)
@@ -152,6 +153,7 @@ program intergrate_layer_depth
   
   
   !! ~~~~~ WRITE NEW FILE ~~~~~
+  write(*,*) '~~~~ CREATING new file '//file_ot
   ! create new file
   nf_stat = NF90_CREATE(file_ot, NF90_HDF5, ncid_ot)
   call nf90_check_error(nf_stat)
@@ -262,6 +264,7 @@ program intergrate_layer_depth
   
   
   ! CALCULATE real_depth
+  write(*,*) '~~~~ CALCULATING new variables for output file'
     ! allocate arrays
   allocate(val_v_real_depth(n_lon, n_lat, n_depth, n_time), &
            val_v_bathy(n_lon, n_lat, n_time))
@@ -281,6 +284,7 @@ program intergrate_layer_depth
   
   
   ! write variables
+  write(*,*) '~~~~ WRITE new variables into output file'
   nf_stat = NF90_PUT_VAR(ncid_ot, id_v_lon, val_v_lon)
   call nf90_check_error(nf_stat, 'error put var lon')
   
@@ -298,6 +302,9 @@ program intergrate_layer_depth
   
   nf_stat = NF90_PUT_VAR(ncid_ot, id_v_dummy, val_v_real_depth)
   call nf90_check_error(nf_stat, 'error put var dummt_depth')
+  
+  
+  write(*,*) 'FINISHED writing; CLOSING input and output files; CLEANING up'
   
   
   ! close input file
@@ -608,7 +615,7 @@ program intergrate_layer_depth
         ! of DEPTH at a specific horizontal location and time as soon as we 
         ! encounter a missing value. 
         do iTi = 1, nTi
-          write(*,'(I4,I4)') iTi
+          ! write(*,'(I4,I4)') iTi
 !$omp parallel do private(tmp_depth, tmp_h, iLa, iLo, proceed_depth, iZ) shared(depth) num_threads( 4 )
           do iLa = 1, nLa
             do iLo = 1, nLo

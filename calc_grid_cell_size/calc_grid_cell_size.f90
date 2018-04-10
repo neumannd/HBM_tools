@@ -94,6 +94,7 @@ program calc_grid_cell_size
   
   
   !! ~~~~~ READ OLD DATA ~~~~~
+  write(*,*) '~~~~ READING file '//file_in
   ! OPEN FILE
   nf_stat = NF90_OPEN(file_in, NF90_NOWRITE, ncid_in)
   call nf90_check_error(nf_stat)
@@ -179,9 +180,14 @@ program calc_grid_cell_size
     
   end if
   
+  if (fillval_h_bad) then
+    write(*,*) 'error: no _FillValue or missing_value found in variable h of input file.'
+    stop
+  end if
   
   
   !! ~~~~~ WRITE NEW FILE ~~~~~
+  write(*,*) '~~~~ CREATING new file '//file_ot
   ! tell the user that MASK will not be created
   if (fillval_h_bad) then
     WRITE(*,*) 'No _FillValue or missing_value found in the choosen variable and file. Not '
@@ -302,6 +308,7 @@ program calc_grid_cell_size
   
   
   ! CALCULATE real_depth
+  write(*,*) '~~~~ CALCULATING new variables for output file'
     ! allocate arrays
   allocate(val_v_cell_area(n_lon, n_lat), &
            val_v_cell_volume(n_lon, n_lat, n_depth, n_time), &
@@ -333,6 +340,7 @@ program calc_grid_cell_size
   
   
   ! write variables
+  write(*,*) '~~~~ WRITE new variables into output file'
   nf_stat = NF90_PUT_VAR(ncid_ot, id_v_lon, val_v_lon)
   call nf90_check_error(nf_stat, 'error put var lon')
   
@@ -358,6 +366,9 @@ program calc_grid_cell_size
     nf_stat = NF90_PUT_VAR(ncid_ot, id_v_mask, val_v_mask)
     call nf90_check_error(nf_stat, 'error put var mask')
   end if
+  
+  
+  write(*,*) 'FINISHED writing; CLOSING input and output files; CLEANING up'
   
   
   ! close input file
