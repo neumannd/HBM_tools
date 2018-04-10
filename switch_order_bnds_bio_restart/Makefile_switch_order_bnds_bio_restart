@@ -1,0 +1,7 @@
+# FC=gcc
+FC=ifort
+FCFLAGS=-nofixed -convert big_endian -stand f08 -g -traceback
+LDFLAGS=''
+
+all: switch_order_bnds_bio_restart.f90
+	$(FC) $(FCFLAGS) -o switch_order_bnds_bio_restart.x switch_order_bnds_bio_restart.f90

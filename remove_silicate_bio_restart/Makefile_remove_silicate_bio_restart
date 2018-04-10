@@ -1,0 +1,7 @@
+# FC=gcc
+FC=ifort
+FCFLAGS='-nofixed -convert big_endian -stand f08'
+LDFLAGS=''
+
+all: remove_silicate_bio_restart.f90
+	$(FC) -o remove_silicate_bio_restart.x remove_silicate_bio_restart.f90

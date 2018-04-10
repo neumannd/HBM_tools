@@ -1,0 +1,7 @@
+# FC=gcc
+FC=ifort
+FCFLAGS='-nofixed -convert big_endian -stand f08'
+LDFLAGS=''
+
+all: change_start_date_bio_restart.f90
+	$(FC) -o change_start_date_bio_restart.x change_start_date_bio_restart.f90

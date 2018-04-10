@@ -1,0 +1,8 @@
+# FC=gfortran
+# FCFLAGS='-fno-fixed-form -std=f2008 -fconvert=big-endian'
+FC=ifort
+FCFLAGS='-nofixed -convert big_endian -stand f08'
+LDFLAGS=''
+
+all: change_start_date_restart.f90
+	$(FC) -o change_start_date_restart.x change_start_date_restart.f90
