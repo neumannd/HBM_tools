@@ -19,7 +19,7 @@ module read_files
   end interface get_filenames
   
   
-  public :: read_variables, read_layers, get_filenames, test_help_string
+  public :: get_filenames, test_help_string
   private :: get_filenames_1, get_filenames_2, get_filenames_3, &
              get_filenames_4, get_filenames_5, get_filenames_6
   
