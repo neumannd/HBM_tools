@@ -68,7 +68,7 @@ program calc_grid_cell_size
   character (len=2048) :: program_call
   
   ! help request?
-  logical :: helpme
+  logical :: helpme = .false.
   
   
   ! check whether help is requested
@@ -76,7 +76,9 @@ program calc_grid_cell_size
   
   
   if (helpme) then
-  
+    
+    call print_help()
+    
   else
     ! GET file_in and file_ot AS INPUT ARGUMENTS
     call get_filenames(file_in, file_ot)
@@ -393,231 +395,300 @@ program calc_grid_cell_size
   end if ! .not. helpme
   
   
-  contains
-    
-    
-    
-    ! ~~~~~ CALC CELL AREA ~~~~~
-    subroutine calc_cell_area(lat, cell_area, count) 
-      
-      implicit none
-      
-      REAL(8), dimension(:),   intent(in)  :: lat
-      REAL(8), dimension(:,:), intent(out) :: cell_area
-      integer, DIMENSION(2),   intent(in)  :: count
-      
-      integer :: iLo, iLa, nLo, nLa
-      real(8) :: tmp_depth, tmp_h
-      logical :: proceed_depth
-      
-      real(8), parameter :: r_earth_eq = 6378.1_8,         &
-                            r_earth_pol = 6356.8_8,        &
-                            dr = r_earth_eq - r_earth_pol, &
-                            r_min = r_earth_pol,           &
-                            pi = 3.141592653589793238_8,   &
-                            deg2rad = pi/180.0_8,          &
-                            dlon = 5.0_8/360.0_8*deg2rad,  &
-                            dlat = 1.0_8/120.0_8*deg2rad
-      real(8)            :: tmp_r, tmp_dx, tmp_dy, tmp_cos_lat
-      
-      nLo = count(1)
-      nLa = count(2)
+contains
 
-      ! Placed as atmos dep in one grid cell of the fine grid. Grid cell data:
-      !   phi:   55 deg N
-      !   d_phi: 30'' N-S  (1/120 deg)
-      !   d_lam: 50'' E-W  (5/360 deg)
-      !
-      ! Earth Radius:
-      !   equator: 6378.1 km (r_max)
-      !   pole:    6356.8 km (r_min)
-      ! 
-      !   dr = 21.3 km
-      !
-      ! Assume :
-      !   r(phi) = r_min + dr * cos(phi)
-      !   r(55 deg) = 6365 km
-      !
-      ! grid cell size in m (dx and dy)
-      !   dy = r * d_phi = 6365 km * 1 / 120 * pi/180 = 0.926 km
-      !   dx = r * cos(phi) * d_lam = 6365 km * cos(55/180*pi) * 5/360 * pi/180 = 0.885 km
-      !
-      !   dA = dx * dy = 0.926 km * 0.885 km = 0.8192739 km2 = 819273.9 m2
+  subroutine print_help()
+  
+    write(*,'(A)') 'HELP FOR calc_grid_cell_size                                         2018/04/13'
+    write(*,'(A)') ''
+    write(*,'(A)') 'NAME'
+    write(*,'(A)') ''
+    write(*,'(A)') '      calc grid cell size - calculate volume and area of each grid cell from'
+    write(*,'(A)') '                              HBM output files'
+    write(*,'(A)') ''
+    write(*,'(A)') ''
+    write(*,'(A)') 'SYNOPSIS'
+    write(*,'(A)') '      calc_grid_cell_size.x file_in.nc file_ot.nc'
+    write(*,'(A)') ''
+    write(*,'(A)') ''
+    write(*,'(A)') 'DESCRIPTION'
+    write(*,'(A)') '      ... TODO ...'
+    write(*,'(A)') '      Try it with a file and see what happens!'
+    write(*,'(A)') ''
+    write(*,'(A)') ''
+    write(*,'(A)') 'OPTIONS'
+    write(*,'(A)') '      -h, --help'
+    write(*,'(A)') '           Print this help.'
+    write(*,'(A)') ''
+    write(*,'(A)') ''
+    write(*,'(A)') 'FILE DESCRIPTIONS'
+    write(*,'(A)') '         '
+    write(*,'(A)') '      file_in.nc'
+    write(*,'(A)') '         '
+    write(*,'(A)') '         The dimensions need to be denoted as --lon--, --lat--, --depth--, and '
+    write(*,'(A)') '         --time--. The data variable h needs to be of type --float-- or '
+    write(*,'(A)') '         --double--. netCDF-4 files are accepted.'
+    write(*,'(A)') '         '
+    write(*,'(A)') '         Here is an example CDL output:'
+    write(*,'(A)') '         '
+    write(*,'(A)') '         ------------------------------------'
+    write(*,'(A)') '         netcdf file_in {'
+    write(*,'(A)') '         dimensions:'
+    write(*,'(A)') '            lon = 414 ;'
+    write(*,'(A)') '            lat = 347 ;'
+    write(*,'(A)') '            depth = 36 ;'
+    write(*,'(A)') '            time = UNLIMITED ; // (5 currently)'
+    write(*,'(A)') '         variables:'
+    write(*,'(A)') '            double lon(lon) ;'
+    write(*,'(A)') '                ...'
+    write(*,'(A)') '            double lat(lat) ;'
+    write(*,'(A)') '                ...'
+    write(*,'(A)') '            double depth(depth) ;'
+    write(*,'(A)') '                ...'
+    write(*,'(A)') '            double time(time) ;'
+    write(*,'(A)') '                ...'
+    write(*,'(A)') '            int h(time, depth, lat, lon) ;'
+    write(*,'(A)') '                h:standard_name = "layer_thicknesses" ;'
+    write(*,'(A)') '                h:units = "m" ;'
+    write(*,'(A)') '                h:_FillValue = -2000000000 ;'
+    write(*,'(A)') '                h:missing_value = -2000000000 ;'
+    write(*,'(A)') '         }'
+    write(*,'(A)') '         ------------------------------------'
+    write(*,'(A)') ''
+    write(*,'(A)') ''
+    write(*,'(A)') 'AUTHORS'
+    write(*,'(A)') '      This code was written by Daniel Neumann at the Leibniz-Institut for Baltic'
+    write(*,'(A)') '      Sea Research Warnemuende (www.io-warnemuende.de). The work was done within'
+    write(*,'(A)') '      the project MeRamo (funded by BMVI, FKZ 50EW1601).'
+    write(*,'(A)') ''
+    write(*,'(A)') ''
+    write(*,'(A)') '2018/04/13'
+  
+  end subroutine print_help
+    
+    
+    
+  ! ~~~~~ CALC CELL AREA ~~~~~
+  subroutine calc_cell_area(lat, cell_area, count) 
+    
+    implicit none
+    
+    REAL(8), dimension(:),   intent(in)  :: lat
+    REAL(8), dimension(:,:), intent(out) :: cell_area
+    integer, DIMENSION(2),   intent(in)  :: count
+    
+    integer :: iLo, iLa, nLo, nLa
+    real(8) :: tmp_depth, tmp_h
+    logical :: proceed_depth
+    
+    real(8), parameter :: r_earth_eq = 6378.1_8,         &
+                          r_earth_pol = 6356.8_8,        &
+                          dr = r_earth_eq - r_earth_pol, &
+                          r_min = r_earth_pol,           &
+                          pi = 3.141592653589793238_8,   &
+                          deg2rad = pi/180.0_8,          &
+                          dlon = 5.0_8/360.0_8*deg2rad,  &
+                          dlat = 1.0_8/120.0_8*deg2rad
+    real(8)            :: tmp_r, tmp_dx, tmp_dy, tmp_cos_lat
+    
+    nLo = count(1)
+    nLa = count(2)
+
+    ! Placed as atmos dep in one grid cell of the fine grid. Grid cell data:
+    !   phi:   55 deg N
+    !   d_phi: 30'' N-S  (1/120 deg)
+    !   d_lam: 50'' E-W  (5/360 deg)
+    !
+    ! Earth Radius:
+    !   equator: 6378.1 km (r_max)
+    !   pole:    6356.8 km (r_min)
+    ! 
+    !   dr = 21.3 km
+    !
+    ! Assume :
+    !   r(phi) = r_min + dr * cos(phi)
+    !   r(55 deg) = 6365 km
+    !
+    ! grid cell size in m (dx and dy)
+    !   dy = r * d_phi = 6365 km * 1 / 120 * pi/180 = 0.926 km
+    !   dx = r * cos(phi) * d_lam = 6365 km * cos(55/180*pi) * 5/360 * pi/180 = 0.885 km
+    !
+    !   dA = dx * dy = 0.926 km * 0.885 km = 0.8192739 km2 = 819273.9 m2
+    
       
-        
-      ! We do not iterate in the proper order in which the data are located
-      ! in the memory. This would we TIME, DEPTH, LAT, and LON (TIME outer
-      ! loop; DEPTH first inner loop; ...). We do instead TIME, LAT, LON, and
-      ! DEPTH. This seems to be reasonable because we can cut the iteration
-      ! of DEPTH at a specific horizontal location and time as soon as we 
-      ! encounter a missing value. 
+    ! We do not iterate in the proper order in which the data are located
+    ! in the memory. This would we TIME, DEPTH, LAT, and LON (TIME outer
+    ! loop; DEPTH first inner loop; ...). We do instead TIME, LAT, LON, and
+    ! DEPTH. This seems to be reasonable because we can cut the iteration
+    ! of DEPTH at a specific horizontal location and time as soon as we 
+    ! encounter a missing value. 
 !$omp parallel do private(tmp_depth, tmp_h, iLa, iLo, proceed_depth, iZ) shared(depth) num_threads( 4 )
-      do iLa = 1, nLa
+    do iLa = 1, nLa
+    
+      tmp_cos_lat = cos(lat(iLa)*deg2rad)
+      tmp_r = r_min + dr * tmp_cos_lat
+      tmp_dx = tmp_r * dlat
+      tmp_dy = tmp_r * tmp_cos_lat * dlon
       
-        tmp_cos_lat = cos(lat(iLa)*deg2rad)
-        tmp_r = r_min + dr * tmp_cos_lat
-        tmp_dx = tmp_r * dlat
-        tmp_dy = tmp_r * tmp_cos_lat * dlon
+      cell_area(1:nLo, iLa) = tmp_dx * tmp_dy * 1000000
         
-        cell_area(1:nLo, iLa) = tmp_dx * tmp_dy * 1000000
-          
-      end do
+    end do
 !$omp end parallel do
-      
-    end subroutine calc_cell_area
-    ! ~~~~~ END CALC CELL AREA ~~~~~
     
+  end subroutine calc_cell_area
+  ! ~~~~~ END CALC CELL AREA ~~~~~
+  
+  
+  
+  ! ~~~~~ CALC MASK ~~~~~
+  subroutine calc_mask(dummy, mask, count, fillval_dummy) 
     
+    implicit none
     
-    ! ~~~~~ CALC MASK ~~~~~
-    subroutine calc_mask(dummy, mask, count, fillval_dummy) 
-      
-      implicit none
-      
-      REAL(8),    dimension(:,:,:,:), intent(in)  :: dummy
-      INTEGER(1), dimension(:,:,:,:), intent(out) :: mask
-      integer,    DIMENSION(4),       intent(in)  :: count
-      real(8),                        intent(in)  :: fillval_dummy
-      
-      integer :: iLo, iLa, iZ, iTi, nLo, nLa, nZ, nTi
-      logical :: proceed_depth
-      
-      nLo = count(1)
-      nLa = count(2)
-      nZ  = count(3)
-      nTi = count(4)
-      
-      mask = 1_1
-      
-      ! We do not iterate in the proper order in which the data are located
-      ! in the memory. This would we TIME, DEPTH, LAT, and LON (TIME outer
-      ! loop; DEPTH first inner loop; ...). We do instead TIME, LAT, LON, and
-      ! DEPTH. This seems to be reasonable because we can cut the iteration
-      ! of DEPTH at a specific horizontal location and time as soon as we 
-      ! encounter a missing value. 
+    REAL(8),    dimension(:,:,:,:), intent(in)  :: dummy
+    INTEGER(1), dimension(:,:,:,:), intent(out) :: mask
+    integer,    DIMENSION(4),       intent(in)  :: count
+    real(8),                        intent(in)  :: fillval_dummy
+    
+    integer :: iLo, iLa, iZ, iTi, nLo, nLa, nZ, nTi
+    logical :: proceed_depth
+    
+    nLo = count(1)
+    nLa = count(2)
+    nZ  = count(3)
+    nTi = count(4)
+    
+    mask = 0_1
+    
+    ! We do not iterate in the proper order in which the data are located
+    ! in the memory. This would we TIME, DEPTH, LAT, and LON (TIME outer
+    ! loop; DEPTH first inner loop; ...). We do instead TIME, LAT, LON, and
+    ! DEPTH. This seems to be reasonable because we can cut the iteration
+    ! of DEPTH at a specific horizontal location and time as soon as we 
+    ! encounter a missing value. 
 !$omp parallel do private(iLa, iLo, iTi, proceed_depth, iZ) shared(mask) num_threads( 4 )
-      do iTi = 1, nTi
+    do iTi = 1, nTi
+      do iLa = 1, nLa
+        do iLo = 1, nLo
+        
+          proceed_depth = .true.
+          iZ = 1
+          do while (proceed_depth .and. (iZ .le. nZ))
+            
+            if ( dummy(iLo, iLa, iZ, iTi) .eq. fillval_dummy ) then
+              proceed_depth = .false.
+            else 
+              mask(iLo, iLa, iZ, iTi) = 1_1
+            endif
+            
+            iZ = iZ + 1
+            
+          end do
+          
+        end do
+      end do
+    end do
+!$omp end parallel do
+    
+  end subroutine calc_mask
+  ! ~~~~~ END CALC MASK ~~~~~
+  
+  
+  
+  ! ~~~~~ replace fill values ~~~~~
+  subroutine convert_fill_value_double(values, fillval_old, fillval_new, count) 
+    
+    implicit none
+    
+    REAL(8),    dimension(:,:,:,:), intent(inOUT) :: values
+    integer,    DIMENSION(4),       intent(in)    :: count
+    real(8),                        intent(in)    :: fillval_old, fillval_new
+    
+    integer :: iLo, iLa, iZ, iTi, nLo, nLa, nZ, nTi
+    logical :: proceed_depth
+    
+    nLo = count(1)
+    nLa = count(2)
+    nZ  = count(3)
+    nTi = count(4)
+    
+!$omp parallel do private(iLa, iLo, iTi, iZ) shared(values) num_threads( 4 )
+    do iTi = 1, nTi
+      do iZ = 1, nZ
         do iLa = 1, nLa
           do iLo = 1, nLo
           
-            proceed_depth = .true.
-            iZ = 1
-            do while (proceed_depth .and. (iZ .le. nZ))
-              
-              if ( dummy(iLo, iLa, iZ, iTi) .eq. fillval_dummy ) then
-                proceed_depth = .false.
-              else 
-                mask(iLo, iLa, iZ, iTi) = 0_1
-              endif
-              
-              iZ = iZ + 1
-              
-            end do
+            if (values(iLo, iLa, iZ, iTi) .eq. fillval_old ) then
+              values(iLo, iLa, iZ, iTi) = fillval_new
+            end if
             
           end do
         end do
       end do
+    end do
 !$omp end parallel do
-      
-    end subroutine calc_mask
-    ! ~~~~~ END CALC MASK ~~~~~
     
+  end subroutine convert_fill_value_double
+  ! ~~~~~ END replace fill values ~~~~~
+  
+  
+  
+  ! ~~~~~ CALC CELL VOLUME ~~~~~
+  subroutine calc_cell_volume(area, thickness, volume, fillval, count) 
     
+    implicit none
     
-    ! ~~~~~ replace fill values ~~~~~
-    subroutine convert_fill_value_double(values, fillval_old, fillval_new, count) 
-      
-      implicit none
-      
-      REAL(8),    dimension(:,:,:,:), intent(inOUT) :: values
-      integer,    DIMENSION(4),       intent(in)    :: count
-      real(8),                        intent(in)    :: fillval_old, fillval_new
-      
-      integer :: iLo, iLa, iZ, iTi, nLo, nLa, nZ, nTi
-      logical :: proceed_depth
-      
-      nLo = count(1)
-      nLa = count(2)
-      nZ  = count(3)
-      nTi = count(4)
-      
-!$omp parallel do private(iLa, iLo, iTi, iZ) shared(values) num_threads( 4 )
-      do iTi = 1, nTi
-        do iZ = 1, nZ
-          do iLa = 1, nLa
-            do iLo = 1, nLo
-            
-              if (values(iLo, iLa, iZ, iTi) .eq. fillval_old ) then
-                values(iLo, iLa, iZ, iTi) = fillval_new
-              end if
-              
-            end do
-          end do
-        end do
-      end do
-!$omp end parallel do
-      
-    end subroutine convert_fill_value_double
-    ! ~~~~~ END replace fill values ~~~~~
+    REAL(8),    dimension(:,:),     intent(in)  :: area
+    REAL(8),    dimension(:,:,:,:), intent(in)  :: thickness
+    REAL(8),    dimension(:,:,:,:), intent(OUT) :: volume
+    integer,    DIMENSION(4),       intent(in)  :: count
+    real(8),                        intent(in)  :: fillval
     
+    integer :: iLo, iLa, iZ, iTi, nLo, nLa, nZ, nTi
+    logical :: proceed_depth
+    real(8) :: tmp_area
     
+    nLo = count(1)
+    nLa = count(2)
+    nZ  = count(3)
+    nTi = count(4)
     
-    ! ~~~~~ CALC CELL VOLUME ~~~~~
-    subroutine calc_cell_volume(area, thickness, volume, fillval, count) 
-      
-      implicit none
-      
-      REAL(8),    dimension(:,:),     intent(in)  :: area
-      REAL(8),    dimension(:,:,:,:), intent(in)  :: thickness
-      REAL(8),    dimension(:,:,:,:), intent(OUT) :: volume
-      integer,    DIMENSION(4),       intent(in)  :: count
-      real(8),                        intent(in)  :: fillval
-      
-      integer :: iLo, iLa, iZ, iTi, nLo, nLa, nZ, nTi
-      logical :: proceed_depth
-      real(8) :: tmp_area
-      
-      nLo = count(1)
-      nLa = count(2)
-      nZ  = count(3)
-      nTi = count(4)
-      
-      volume = fillval
-      
-      ! We do not iterate in the proper order in which the data are located
-      ! in the memory. This would we TIME, DEPTH, LAT, and LON (TIME outer
-      ! loop; DEPTH first inner loop; ...). We do instead TIME, LAT, LON, and
-      ! DEPTH. This seems to be reasonable because we can cut the iteration
-      ! of DEPTH at a specific horizontal location and time as soon as we 
-      ! encounter a missing value. 
+    volume = fillval
+    
+    ! We do not iterate in the proper order in which the data are located
+    ! in the memory. This would we TIME, DEPTH, LAT, and LON (TIME outer
+    ! loop; DEPTH first inner loop; ...). We do instead TIME, LAT, LON, and
+    ! DEPTH. This seems to be reasonable because we can cut the iteration
+    ! of DEPTH at a specific horizontal location and time as soon as we 
+    ! encounter a missing value. 
 !$omp parallel do private(tmp_area, iLa, iLo, iTi, proceed_depth, iZ) shared(mask) num_threads( 4 )
-      do iTi = 1, nTi
-        do iLa = 1, nLa
-          do iLo = 1, nLo
-            tmp_area = area(iLo, iLa)
+    do iTi = 1, nTi
+      do iLa = 1, nLa
+        do iLo = 1, nLo
+          tmp_area = area(iLo, iLa)
+          
+          proceed_depth = .true.
+          iZ = 1
+          do while (proceed_depth .and. (iZ .le. nZ))
             
-            proceed_depth = .true.
-            iZ = 1
-            do while (proceed_depth .and. (iZ .le. nZ))
-              
-              if ( thickness(iLo, iLa, iZ, iTi) .eq. fillval) then
-                proceed_depth = .false.
-              else 
-                volume(iLo, iLa, iZ, iTi) = thickness(iLo, iLa, iZ, iTi) * &
-                                             tmp_area
-              endif
-              
-              iZ = iZ + 1
-              
-            end do
+            if ( thickness(iLo, iLa, iZ, iTi) .eq. fillval) then
+              proceed_depth = .false.
+            else 
+              volume(iLo, iLa, iZ, iTi) = thickness(iLo, iLa, iZ, iTi) * &
+                                           tmp_area
+            endif
+            
+            iZ = iZ + 1
             
           end do
+          
         end do
       end do
+    end do
 !$omp end parallel do
-      
-    end subroutine calc_cell_volume
-    ! ~~~~~ END CALC CELL VOLUME ~~~~~
+    
+  end subroutine calc_cell_volume
+  ! ~~~~~ END CALC CELL VOLUME ~~~~~
   
 
 

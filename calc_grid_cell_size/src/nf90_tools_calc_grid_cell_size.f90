@@ -291,7 +291,7 @@ contains
     
     
     ! put attributes
-    nf_stat = nf90_put_att(ncid, id_v, 'standard_name', 'land_binary_mask')
+    nf_stat = nf90_put_att(ncid, id_v, 'standard_name', 'sea_binary_mask')
     call check_nf90_stat(nf_stat, 'error put att standard_name of var '//trim(varname))
     
     nf_stat = nf90_put_att(ncid, id_v, 'long_name', 'land_binary_mask')
@@ -302,7 +302,7 @@ contains
     
     nf_stat = nf90_put_att(ncid, id_v, 'description', 'X_binary_mask has '//&
                            '1 where condition X is met, 0 elsewhere. 1 = '//&
-                           'land, 0 = sea.')
+                           'sea, 0 = land.')
     call check_nf90_stat(nf_stat, 'error put att description of var '//trim(varname))
     
     nf_stat = nf90_put_att(ncid, id_v, '_FillValue', fillval)
