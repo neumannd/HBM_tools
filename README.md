@@ -30,7 +30,7 @@ This code was written by Daniel Neumann at the Leibniz-Institut for Baltic Sea R
   
 -------
 
-[up](#HBM-Tools)
+[up](#hbm-Tools)
 
 ## calc_grid_cell_size
 
@@ -39,7 +39,7 @@ See HELP output. TODO: Copy `-h` output here.
 
 -------
 
-[up](#HBM-Tools)
+[up](#hbm-Tools)
 
 ## calc_n_distribution
 
@@ -48,7 +48,7 @@ See HELP output. TODO: Copy `-h` output here.
 
 -------
 
-[up](#HBM-Tools)
+[up](#hbm-Tools)
 
 ## change_start_date_bio_restart
 
@@ -56,7 +56,7 @@ See HELP output. TODO: Copy `-h` output here.
 
 -------
 
-[up](#HBM-Tools)
+[up](#hbm-Tools)
 
 ## change_start_date_restart
 
@@ -64,7 +64,7 @@ TODO
 
 -------
 
-[up](#HBM-Tools)
+[up](#hbm-Tools)
 
 ## create_mask
 
@@ -73,7 +73,7 @@ See HELP output. TODO: Copy `-h` output here.
 
 -------
 
-[up](#HBM-Tools)
+[up](#hbm-Tools)
 
 ## integrate_layer_depth
 
@@ -81,7 +81,7 @@ See HELP output. TODO: Copy `-h` output here.
 
 -------
 
-[up](#HBM-Tools)
+[up](#hbm-Tools)
 
 ## remove_silicate_bio_restart
 
@@ -89,7 +89,7 @@ See HELP output. TODO: Copy `-h` output here.
 
 -------
 
-[up](#HBM-Tools)
+[up](#hbm-Tools)
 
 ## reset_silicate_bio_restart
 
@@ -97,7 +97,7 @@ See HELP output. TODO: Copy `-h` output here.
 
 -------
 
-[up](#HBM-Tools)
+[up](#hbm-Tools)
 
 ## switch_order_bnds_bio_restart
 
@@ -105,5 +105,5 @@ See HELP output. TODO: Copy `-h` output here.
 
 -------
 
-[up](#HBM-Tools)
+[up](#hbm-Tools)
 
