@@ -1,0 +1,8 @@
+src/test_pnply.o : src/point_in_polygon.o
+src/test_pnply.o : src/read_polygon.o
+src/test_pnply.o : src/check_stat_nonetcdf.o
+src/test_pnply.o : src/test_pnply.f90
+src/point_in_polygon.o : src/point_in_polygon.f90
+src/read_polygon.o : src/check_stat_nonetcdf.o
+src/read_polygon.o : src/read_polygon.f90
+src/check_stat_nonetcdf.o : src/check_stat_nonetcdf.f90

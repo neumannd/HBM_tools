@@ -1,0 +1,17 @@
+src/create_mask.o : src/point_in_polygon.o
+src/create_mask.o : src/read_polygon.o
+src/create_mask.o : src/read_files.o
+src/create_mask.o : src/nf90_tools_create_mask.o
+src/create_mask.o : src/time_tools.o
+src/create_mask.o : src/check_stat_netcdf.o
+src/create_mask.o : src/create_mask.f90
+src/read_files.o : src/check_stat_nonetcdf.o
+src/read_files.o : src/read_files.f90
+src/nf90_tools_create_mask.o : src/check_stat_netcdf.o
+src/nf90_tools_create_mask.o : src/nf90_tools_create_mask.f90
+src/point_in_polygon.o : src/point_in_polygon.f90
+src/read_polygon.o : src/check_stat_nonetcdf.o
+src/read_polygon.o : src/read_polygon.f90
+src/check_stat_netcdf.o : src/check_stat_netcdf.f90
+src/check_stat_nonetcdf.o : src/check_stat_nonetcdf.f90
+src/time_tools.o : src/time_tools.f90

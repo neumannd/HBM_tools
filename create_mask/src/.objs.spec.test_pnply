@@ -1,0 +1,5 @@
+OBJS:=\
+src/test_pnply.o \
+src/point_in_polygon.o \
+src/read_polygon.o \
+src/check_stat_nonetcdf.o

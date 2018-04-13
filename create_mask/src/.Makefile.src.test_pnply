@@ -1,0 +1,5 @@
+d               := $(dir)
+include $(d)/.objs.spec.test_pnply
+include $(d)/.dependencies.test_pnply
+$(OBJS): $(d)/.Makefile.src.test_pnply
+allobs: $(OBJS)

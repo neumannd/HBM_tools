@@ -1,0 +1,21 @@
+all: allobs
+	$(FC) $(OBJS) $(LDFLAGS) $(LIBS) -o $(SRC)/test_pnply.x
+
+allobs : $(OBJS)
+
+%.o : %.f90
+	\cd $(<D) && $(FC) $(<F) -c $(FCFLAGS)
+
+install: all
+	mv $(SRC)/test_pnply.x $(BIN)/test_pnply.x
+
+clean:
+	cd $(SRC) && rm *.mod *.o
+
+
+dir := .
+include Makefile.include.gfortran
+# include Makefile.include.ifort
+
+dir := $(SRC)
+include $(dir)/.Makefile.src.test_pnply

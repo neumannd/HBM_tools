@@ -1,0 +1,195 @@
+HELP FOR calc_n_distribution                                         2018/04/13
+
+NAME
+
+      calc_n_distribution - calculate vertical and horizontal average nutrient 
+                            amounts in specific area
+
+
+SYNOPSIS
+      calc_n_distribution.x file_varnames.txt file_layers.txt file_mask.nc \
+                            file_volume.nc file_in.nc file_ot.nc dir_ot_text
+
+
+DESCRIPTION
+      We calculate the vertical sum over some model layers and write it into 
+      the output file --file_ot.nc--. Additionally, we calculate the horizontal
+      sum and write each variable into one file into the output directory 
+      --dir_ot_text--. The layers, which are considered, are defined in 
+      --file_layers.txt--. The variables are read from the input file 
+      --file_in.nc--. The variables, which should be considered, are listed in 
+      --file_varnames.txt--. The file --file_mask.nc-- provides a horizontal
+      mask, on which grid cells are to consider. The file --file_volume.nc--
+      contains the volume of each grid cell in order to calculate the amount of
+      nutrients from the concentrations of nutrients.
+
+
+OPTIONS
+      -h, --help
+           Print this help.
+
+
+FILE DESCRIPTIONS
+
+      file_varnames.txt
+         
+         The file needs to have a header row. In each subsequent row one 
+         variable name per row needs to be provided. Here is an example:
+         
+         ------------------------------------
+         my variable names
+         variable1
+         variable2
+         variable3
+         ------------------------------------
+         
+         
+      file_layers.txt
+         
+         The file needs to have a header row. In each subsequent row one layer
+         definition has to be provided. A layer definition consists of a suffix,
+         a minimum layer, a maximum layer, and a comment. The vertical sum will
+         be calculated from the min to the max layer. It is no problem if both
+         values are exchanged. The prefix is prepended to the variable names in
+         the output netCDF file and to the filenames of the output text files.
+         The comment has no effect.
+         
+         NOTE: Please not the exact format specification. Column 1 has a width
+         of 32, colums 2 and 3 each a width of 5, and column 4 and maximum width
+         of 255. Each column is separated by a semicolon --;--, which is not 
+         counted to the column width. Thus, the maximum width of one line is
+         300 (= 32 + 1 + 5 + 1 + 5 + 1 + 255).
+         
+         Here is an example:
+         
+         ------------------------------------
+         layer name                      ;min  ;max  ;comment
+         sur_                            ;    1;    5; surface layer
+         bot_                            ;   28;   36; layers below halocline
+         ------------------------------------
+         
+         
+      file_mask.nc
+         
+         The dimensions need to be denoted as --lon-- and --lat--. The mask
+         variable needs to be denoted as --mask-- and be of type --byte--.
+         netCDF-4 files are accepted.
+         
+         Here is an example CDL output:
+         
+         ------------------------------------
+         netcdf file_mask {
+         dimensions:
+            lon = 414 ;
+            lat = 347 ;
+         variables:
+            double lon(lon) ;
+                lon:units = "degrees_east" ;
+                lon:standard_name = "longitude" ;
+                lon:long_name = "longitude" ;
+                lon:axis = "x" ;
+            double lat(lat) ;
+                lat:units = "degrees_north" ;
+                lat:standard_name = "latitude" ;
+                lat:long_name = "latitude" ;
+                lat:axis = "y" ;
+            byte mask(lat, lon) ;
+                mask:standard_name = "TODO_binary_mask" ;
+                mask:long_name = "TODO_binary_mask" ;
+                mask:units = "1" ;
+                mask:description = "1 = TODO area." ;
+                mask:_FillValue = -1b ;
+                mask:missing_value = -1b ;
+         }
+         ------------------------------------
+         
+         
+      file_volume.nc
+         
+         The dimensions need to be denoted as --lon--, --lat--, --depth--, and 
+         --time--. The volume variable needs to be denoted as --cell_volume-- 
+         and be of type --float-- or --double--. Its unit needs to be equal to
+         the volume-unit in the concentration of the variables in the variable
+         input --file_in.nc--. netCDF-4 files are accepted.
+         
+         Here is an example CDL output:
+         
+         ------------------------------------
+         netcdf file_volume {
+         dimensions:
+            lon = 414 ;
+            lat = 347 ;
+            depth = 36 ;
+            time = 5 ;
+         variables:
+            double lon(lon) ;
+                ...
+            double lat(lat) ;
+                ...
+            double depth(depth) ;
+                ...
+            double time(time) ;
+                ...
+            float cell_volume(time, depth, lat, lon) ;
+                cell_volume:standard_name = "cell_volumne" ;
+                cell_volume:long_name = "cell_volume" ;
+                cell_volume:units = "m3" ;
+                cell_volume:description = "..." ;
+                cell_volume:_FillValue = -999.f ;
+                cell_volume:missing_value = -999.f ;
+         }
+         ------------------------------------
+         
+         
+      file_in.nc
+         
+         The dimensions need to be denoted as --lon--, --lat--, --depth--, and 
+         --time--. The data variables need to be of type --float-- or 
+         --double--. Its volume-unit in the denominator needs to be equal to
+         the volume-unit in the grid cell volume variable of the volume file 
+         --file_volume.nc--. netCDF-4 files are accepted.
+         
+         Here is an example CDL output:
+         
+         ------------------------------------
+         netcdf p_biodat_coarse_MR_WORKT1_merge_mean_2012_day001to005 {
+         dimensions:
+            lon = 414 ;
+            lat = 347 ;
+            depth = 36 ;
+            time = UNLIMITED ; // (5 currently)
+         variables:
+            double lon(lon) ;
+                ...
+            double lat(lat) ;
+                ...
+            double depth(depth) ;
+                ...
+            double time(time) ;
+                ...
+            int variable1(time, depth, lat, lon) ;
+                variable1:standard_name = "variable1_in_seawater" ;
+                variable1:units = "micromol N/m3" ;
+                variable1:_FillValue = -999 ;
+                variable1:missing_value = -999 ;
+            int variable1(time, depth, lat, lon) ;
+                variable2:standard_name = "variable2_in_seawater" ;
+                variable2:units = "micromol N/m3" ;
+                variable2:_FillValue = -999 ;
+                variable2:missing_value = -999 ;
+            int variable3(time, depth, lat, lon) ;
+                variable3:standard_name = "variable3_in_seawater" ;
+                variable3:units = "micromol N/m3" ;
+                variable3:_FillValue = -999 ;
+                variable3:missing_value = -999 ;
+         }
+         ------------------------------------
+
+
+AUTHORS
+      This code was written by Daniel Neumann at the Leibniz-Institut for Baltic
+      Sea Research Warnemuende (www.io-warnemuende.de). The work was done within
+      the project MeRamo (funded by BMVI, FKZ 50EW1601).
+
+
+2018/04/13
