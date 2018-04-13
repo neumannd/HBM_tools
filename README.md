@@ -1,6 +1,10 @@
 # HBM-Tools
 
-These are some tools that I used to process HBM and HBM-ERGOM data. Please be aware that the format of HBM binary restart files changed over time. Therefore, some tools are only working with specific versions of the HBM.
+These are some tools that I used to process HBM and HBM-ERGOM data.
+
+Please be aware that the format of HBM binary restart files changed over time. Therefore, some tools are only working with specific versions of the HBM.
+
+This code was written by Daniel Neumann at the Leibniz-Institut for Baltic Sea Research Warnemuende (www.io-warnemuende.de/daniel-neumann.html). The work was done within the project MeRamo (funded by BMVI, FKZ 50EW1601).
 
 
 
