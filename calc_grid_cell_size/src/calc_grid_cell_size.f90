@@ -1,3 +1,19 @@
+!> \file calc_grid_cell_size.f90
+!! \brief calculate volume and area of each grid cell from HBM output files
+! 
+! Calculate volume and area of each grid cell from HBM output files.
+! 
+! Try it with a file and see what happens!
+! 
+! This code was written by Daniel Neumann at the Leibniz-Institut for Baltic
+! Sea Research Warnemuende (www.io-warnemuende.de). The work was done within'
+! the project MeRamo (funded by BMVI, FKZ 50EW1601)
+!
+!> Module: Main Programm, calc_grid_cell_size
+!> \author Daniel Neumann, IOW
+!> \date 13.04.2018
+
+
 program calc_grid_cell_size
 
   use netcdf

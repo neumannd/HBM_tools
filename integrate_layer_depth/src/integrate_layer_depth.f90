@@ -1,3 +1,19 @@
+!> \file integrate_layer_depth.f90
+!! \brief calculate depth of each layer and bathymetry from HBM output files
+! 
+! Calculate depth of each layer and bathymetry from HBM output files.
+! 
+! Try it with a file and see what happens!
+! 
+! This code was written by Daniel Neumann at the Leibniz-Institut for Baltic
+! Sea Research Warnemuende (www.io-warnemuende.de). The work was done within'
+! the project MeRamo (funded by BMVI, FKZ 50EW1601)
+!
+!> Module: Main Programm, integrate_layer_depth
+!> \author Daniel Neumann, IOW
+!> \date 13.04.2018
+
+
 program integrate_layer_depth
 
   ! use netcdf4_f03
