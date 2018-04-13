@@ -1,6 +1,7 @@
 testfiles
 *.x
 *.o
+*.mod
 *.s
 *.nc
 */*.nc
