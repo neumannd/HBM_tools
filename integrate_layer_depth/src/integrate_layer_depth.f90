@@ -3,7 +3,7 @@ program integrate_layer_depth
   ! use netcdf4_f03
   use netcdf
   use omp_lib
-  use nf90_tools
+  use nf90_tools_integrate_layer_depth
   use check_stat_netcdf
   use read_files
   use time_tools
@@ -30,12 +30,7 @@ program integrate_layer_depth
   integer             :: nf_stat         ! for error status of netCDF functions
   integer             :: ncid_in, ncid_ot  ! ncid for input and output
   
-  CHARACTER (len=8)        :: str_date
-  CHARACTER (len=10)       :: str_time
-  CHARACTER (len=5)        :: str_zone
-  integer(4), dimension(8) :: int_date_and_time
   character (len=20)       :: str_time_stamp
-  character (len=47)       :: fmt_time_stamp 
   
   ! variable for program call information
   character (len=2048) :: program_call
@@ -49,7 +44,9 @@ program integrate_layer_depth
   
   
   if (helpme) then
-  
+    
+    call print_help()
+    
   else
     ! GET file_in and file_ot AS INPUT ARGUMENTS
     call get_filenames(file_in, file_ot)

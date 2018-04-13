@@ -1,4 +1,4 @@
-module nf90_tools
+module nf90_tools_integrate_layer_depth
 
   use netcdf
   use check_stat_netcdf
@@ -236,4 +236,4 @@ contains
   end function nf90_set_global_atts
   ! ~~~~~ END SET GLOBAL ATTRIBUTES ~~~~~
 
-end module nf90_tools
+end module nf90_tools_integrate_layer_depth
