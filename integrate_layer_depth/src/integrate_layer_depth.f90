@@ -1,4 +1,4 @@
-program intergrate_layer_depth
+program integrate_layer_depth
 
   ! use netcdf4_f03
   use netcdf
@@ -482,4 +482,4 @@ contains
   ! ~~~~~ END CALC DEPTH ~~~~~
 
 
-end program intergrate_layer_depth
+end program integrate_layer_depth
