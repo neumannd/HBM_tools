@@ -10,7 +10,7 @@ install: all
 	mv $(SRC)/calc_grid_cell_size.x $(BIN)/calc_grid_cell_size.x
 
 clean:
-	cd $(SRC) && rm *.x *.o
+	cd $(SRC) && rm *.mod *.o
 
 dir := .
 include Makefile.include.gfortran
