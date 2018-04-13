@@ -8,8 +8,10 @@ These are some tools that I used to process HBM and HBM-ERGOM data. Please be aw
 
   * [add_tracer_bio_restart](#add_tracer_bio_restart)
   * [calc_grid_cell_size](#calc_grid_cell_size)
+  * [calc_n_distribution](#calc_n_distribution)
   * [change_start_date_bio_restart](#change_start_date_bio_restart)
   * [change_start_date_restart](#change_start_date_restart)
+  * [create_mask](#create_mask)
   * [integrate_layer_depth](#integrate_layer_depth)
   * [remove_silicate_bio_restart](#remove_silicate_bio_restart)
   * [reset_silicate_bio_restart](#reset_silicate_bio_restart)
@@ -35,6 +37,15 @@ See HELP output. TODO: Copy `-h` output here.
 
 [up](#HBM-Tools)
 
+# calc_n_distribution
+
+See HELP output. TODO: Copy `-h` output here.
+
+
+-------
+
+[up](#HBM-Tools)
+
 # change_start_date_bio_restart
 
   Please use [change_start_date_restart](#change_start_date_restart) instead. `change_start_date_restart` is more rebust. `change_start_date_bio_restart` possibly does not work with the current HBM-ERGOM binary bio_restart files.
@@ -46,6 +57,15 @@ See HELP output. TODO: Copy `-h` output here.
 # change_start_date_restart
 
 TODO
+
+-------
+
+[up](#HBM-Tools)
+
+# create_mask
+
+See HELP output. TODO: Copy `-h` output here.
+
 
 -------
 
