@@ -17,3 +17,6 @@ LIBS=-lnetcdff -lnetcdf -lhdf5_hl -lhdf5 -lz -lm
 # -stand f03
 # -qopenmp
 # -O2
+
+## use
+# module load intel.studio/16.0.3.210
