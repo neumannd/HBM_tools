@@ -10,7 +10,7 @@ install: all
 	mv $(SRC)/integrate_layer_depth.x $(BIN)/integrate_layer_depth.x
 
 clean:
-	cd $(SRC) && rm *.x *.o
+	cd $(SRC) && rm *.mod *.o
 
 dir := .
 include Makefile.include.gfortran
