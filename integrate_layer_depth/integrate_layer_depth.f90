@@ -6,6 +6,7 @@ program intergrate_layer_depth
   use nf90_tools
   use check_stat_netcdf
   use read_files
+  use time_tools
   
   ! NC_ENOTATT not found???? Would be -43
 
@@ -36,6 +37,9 @@ program intergrate_layer_depth
   character (len=20)       :: str_time_stamp
   character (len=47)       :: fmt_time_stamp 
   
+  ! variable for program call information
+  character (len=2048) :: program_call
+  
   ! help request?
   logical :: helpme
   
@@ -55,16 +59,11 @@ program intergrate_layer_depth
       stop
     end if
     
-    
-    ! GET TIME AND DATE FOR HISTORY ATTRIBUTE and construct time stamp string
-    call date_and_time(str_date, str_time, str_zone, int_date_and_time)
-    fmt_time_stamp = '(I4,A1,I2.2,A1,I2.2,A1,I2.2,A1,I2.2,A1,I2.2,A1)'
-    write(str_time_stamp, fmt_time_stamp) int_date_and_time(1), '-', &
-                                          int_date_and_time(2), '-', &
-                                          int_date_and_time(3), ' ', &
-                                          int_date_and_time(5), ':', &
-                                          int_date_and_time(6), ':', &
-                                          int_date_and_time(7), ':'
+    ! get command
+    call get_command(program_call)
+  
+    ! get time stamp
+    call generate_time_stamp(str_time_stamp)
     
     
     !! ~~~~~ READ OLD DATA ~~~~~
@@ -259,8 +258,7 @@ program intergrate_layer_depth
     nf_stat = nf90_copy_global_atts(ncid_in, ncid_ot)
     call check_nf90_stat(nf_stat, 'error copy atts global')
     nf_stat = nf90_set_global_atts(ncid_in, ncid_ot, &
-                                   str_time_stamp//' integrate_layer_depth.x '//&
-                                   trim(file_in)//' '//trim(file_ot))
+                                   str_time_stamp//' '//program_call)
     call check_nf90_stat(nf_stat, 'error copy atts global')
     
     
