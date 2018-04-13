@@ -1,0 +1,12 @@
+src/intergrate_layer_depth.o : src/read_files.o
+src/intergrate_layer_depth.o : src/nf90_tools.o
+src/intergrate_layer_depth.o : src/check_stat_netcdf.o
+src/intergrate_layer_depth.o : src/time_tools.o
+src/intergrate_layer_depth.o : src/intergrate_layer_depth.f90
+src/read_files.o : src/check_stat_nonetcdf.o
+src/read_files.o : src/read_files.f90
+src/nf90_tools.o : src/check_stat_netcdf.o
+src/nf90_tools.o : src/nf90_tools.f90
+src/check_stat_netcdf.o : src/check_stat_netcdf.f90
+src/check_stat_nonetcdf.o : src/check_stat_nonetcdf.f90
+src/time_tools.o : src/time_tools.f90
