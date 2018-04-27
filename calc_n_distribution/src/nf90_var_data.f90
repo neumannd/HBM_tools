@@ -387,32 +387,47 @@ contains
   
   ! ~~~~~~~~~~~~~~~~~~~~~~~~~ copy_nf90_dimensions ~~~~~~~~~~~~~~~~~~~~~~~~~~~
     !! DON'T COPY DIMENSIONS WITH START == -1!!!
-  subroutine copy_nf90_dimensions(ncid_in, ncid_ot, start, count, id_d_ot)
+  subroutine copy_nf90_dimensions(ncid_in, ncid_ot, start, count, id_d_ot, &
+                                  dim_rename, nrename)
     
-    integer,                            intent(in)  :: ncid_in, ncid_ot
-    integer, dimension(4),              intent(in)  :: start, count
-    integer, dimension(:), allocatable, intent(out) :: id_d_ot
+    integer,                                    intent(in)  :: ncid_in, ncid_ot
+    integer, dimension(4),                      intent(in)  :: start, count
+    integer, dimension(:), allocatable,         intent(out) :: id_d_ot
+    character(LEN=*), DIMENSION(:,:), OPTIONAL, INTENT(IN)  :: dim_rename ! 1: old name; 2: new name
+                           ! size: 2 x nrename
+    INTEGER,                          OPTIONAL, INTENT(IN)  :: nrename
     
     ! status variables
     integer :: nf_stat
     
     ! dimension information
-    character(len=255), dimension(4)              :: dim_names   ! names of dimensions
+    character(len=255), dimension(4)              :: dim_names_in ! names of dimensions
+    character(len=255), dimension(4)              :: dim_names_ot ! names of dimensions
     integer,            dimension(4)              :: dim_lengths ! length of each dimension
     integer                                       :: n_d_ot      ! number of output dimensions
     integer,            dimension(4)              :: id_d_in2ot
     integer,            dimension(:), allocatable :: id_d_ot2in
+    integer                                       :: id_d_rec ! record dimension ID
     
     ! local modified variables of input parameters
     integer, dimension(4) :: count_loc
     
     ! iterators
-    integer :: i_in, i_ot
+    integer :: i_in, i_ot, i_rn
     
+    
+    if(present(dim_rename)) then
+      if(.not. present(nrename)) then
+        write(*,'(A25,I5)') 'error: if dim_rename is present nrename also has to be present'
+        stop
+      end if
+    end if
     
     ! copy input parameter
     count_loc = count
     
+    ! get the dimid of the record dimension
+    nf_stat = nf90_inquire(ncid_in, unlimitedDimId = id_d_rec)
     
     ! count number of output dimensions and allocate arrays
     n_d_ot = 0
@@ -433,14 +448,30 @@ contains
         id_d_ot2in(i_ot) = i_in
       
         ! GET DIMs
-        nf_stat = NF90_INQUIRE_DIMENSION(ncid_in, i_in, dim_names(i_in), dim_lengths(i_in))
+        nf_stat = NF90_INQUIRE_DIMENSION(ncid_in, i_in, dim_names_in(i_in), dim_lengths(i_in))
         call check_nf90_stat(nf_stat, 'error inq dim info')
         
         ! look if count needs to be set
         if (count_loc(i_in) .eq. -1) count_loc(i_in) = dim_lengths(i_in)
         
+        ! set output dimnames (look, whether we have to rename some)
+        dim_names_ot(i_in) = dim_names_in(i_in)
+        if (present(dim_rename)) then
+          DO i_rn = 1, nrename
+            if ( trim(dim_rename(1,i_rn)) .eq. trim(dim_names_in(i_in)) ) THEN
+              dim_names_ot(i_in) = dim_rename(2,i_rn)
+            END IF
+          END DO
+        end if
+        
         ! DEF DIMs
-        nf_stat = NF90_DEF_DIM(ncid_ot, dim_names(i_in), count_loc(i_in), id_d_ot(i_ot))
+        if (i_in .eq. id_d_rec) then
+          nf_stat = NF90_DEF_DIM(ncid_ot, dim_names_ot(i_in), NF90_UNLIMITED, id_d_ot(i_ot))
+          call check_nf90_stat(nf_stat, 'error defining dim')
+        else
+          nf_stat = NF90_DEF_DIM(ncid_ot, dim_names_ot(i_in), count_loc(i_in), id_d_ot(i_ot))
+          call check_nf90_stat(nf_stat, 'error defining dim')
+        END IF
         
         ! increment i_ot
         i_ot = i_ot + 1
@@ -450,18 +481,20 @@ contains
     
     ! get and copy dimensional variables
     do i_ot = 1, n_d_ot
-      call copy_nf90_dim_variable_def(ncid_in, ncid_ot,            &
-                                      dim_names(id_d_ot2in(i_ot)), &
-                                      id_d_in2ot)
+      call copy_nf90_dim_variable_def(ncid_in, ncid_ot,               &
+                                      dim_names_in(id_d_ot2in(i_ot)), &
+                                      id_d_in2ot,                     &
+                                      dim_names_ot(id_d_ot2in(i_ot)))
       nf_stat = NF90_ENDDEF(ncid_ot)
       call check_nf90_stat(nf_stat, 'leaving definition mode to copy dim '//&
-                                    'var '//trim(dim_names(id_d_ot2in(i_ot))))
-      call copy_nf90_dim_variable_val(ncid_in, ncid_ot,            &
-                                      dim_names(id_d_ot2in(i_ot)), &
-                                      id_d_in2ot, start, count)
+                                    'var '//trim(dim_names_in(id_d_ot2in(i_ot))))
+      call copy_nf90_dim_variable_val(ncid_in, ncid_ot,               &
+                                      dim_names_in(id_d_ot2in(i_ot)), &
+                                      id_d_in2ot, start, count,       &
+                                      dim_names_ot(id_d_ot2in(i_ot)))
       nf_stat = NF90_REDEF(ncid_ot)
       call check_nf90_stat(nf_stat, 'leaving definition mode to copy dim '//&
-                                    'var '//trim(dim_names(id_d_ot2in(i_ot))))
+                                    'var '//trim(dim_names_in(id_d_ot2in(i_ot))))
     end do
     
     
