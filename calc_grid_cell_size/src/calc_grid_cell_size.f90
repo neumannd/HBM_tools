@@ -231,7 +231,7 @@ program calc_grid_cell_size
     nf_stat = nf90_def_dim(ncid_ot, 'depth', n_depth, id_d_depth)
     call check_nf90_stat(nf_stat, 'error def dim depth')
     
-    nf_stat = nf90_def_dim(ncid_ot, 'time', n_time, id_d_time)
+    nf_stat = nf90_def_dim(ncid_ot, 'time', NF90_UNLIMITED, id_d_time)
     call check_nf90_stat(nf_stat, 'error def dim time')
     
     
