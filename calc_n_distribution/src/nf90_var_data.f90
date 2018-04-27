@@ -1287,7 +1287,7 @@ contains
       call check_nf90_stat(nf_stat, 'get byte attribte '//trim(att_name))
       double_tmp = dble(byte_in)
     else 
-      write(*,*) 'Fill value of attribute '//trim(att_name)//' not of nice type.'
+      write(*,*) 'Fill value of input attribute '//trim(att_name)//' not of nice type.'
       stop
     end if
     
@@ -1309,7 +1309,7 @@ contains
       nf_stat = nf90_put_att(ncid_ot, varid_ot, att_name, int(double_tmp,1))
       call check_nf90_stat(nf_stat, 'put byte attribte '//trim(att_name))
     else 
-      write(*,*) 'Fill value of attribute '//trim(att_name)//' not of nice type.'
+      write(*,*) 'Fill value of output attribute '//trim(att_name)//' not of nice type.'
       stop
     end if
     
