@@ -1296,16 +1296,16 @@ contains
     if (new_type .eq. NF90_DOUBLE) then
       nf_stat = nf90_put_att(ncid_ot, varid_ot, att_name, double_tmp)
       call check_nf90_stat(nf_stat, 'put double attribte '//trim(att_name))
-    else if (old_type .eq. NF90_FLOAT) then
+    else if (new_type .eq. NF90_FLOAT) then
       nf_stat = nf90_put_att(ncid_ot, varid_ot, att_name, real(double_tmp))
       call check_nf90_stat(nf_stat, 'put float attribte '//trim(att_name))
-    else if (old_type .eq. NF90_INT) then
+    else if (new_type .eq. NF90_INT) then
       nf_stat = nf90_put_att(ncid_ot, varid_ot, att_name, int(double_tmp))
       call check_nf90_stat(nf_stat, 'put int attribte '//trim(att_name))
-    else if (old_type .eq. NF90_SHORT) then
+    else if (new_type .eq. NF90_SHORT) then
       nf_stat = nf90_put_att(ncid_ot, varid_ot, att_name, int(double_tmp,2))
       call check_nf90_stat(nf_stat, 'put short attribte '//trim(att_name))
-    else if (old_type .eq. NF90_BYTE) then
+    else if (new_type .eq. NF90_BYTE) then
       nf_stat = nf90_put_att(ncid_ot, varid_ot, att_name, int(double_tmp,1))
       call check_nf90_stat(nf_stat, 'put byte attribte '//trim(att_name))
     else 
