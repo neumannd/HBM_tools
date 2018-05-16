@@ -169,7 +169,7 @@ program integrate_layer_depth
     CALL def_nf90_bnds_dimvars(ncid_ot, (/dimnames_ot(4)/), &
                                (/id_dims_ot(4)/), 1, &
                                id_dim_nv, id_varbndsdims_ot)
-    CALL def_nf90_bnds_var(ncid_ot, 'depth', id_dim_nv, id_v_depth_bnds)
+    CALL def_nf90_bnds_var(ncid_ot, 'depth', id_dim_nv, id_v_depth_bnds, deflate = 1)
     
     
     ! set global attributes

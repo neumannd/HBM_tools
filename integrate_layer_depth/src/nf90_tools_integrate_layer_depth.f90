@@ -439,8 +439,6 @@ contains
       ! define variable
       nf_stat = NF90_DEF_VAR(ncid_ot, vars_ot(icopy), xtype_ot, id_d_ot, id_v_ot)
       call check_nf90_stat(nf_stat, 'error defining var '//vars_ot(icopy))
-      nf_stat = nf90_def_var_deflate(ncid_ot, id_v_ot, 0, 1, 1)
-      call check_nf90_stat(nf_stat, 'error def deflate var '//vars_ot(icopy))
       
       ! copy attributes
       do iatt = 1, n_atts
@@ -1566,12 +1564,14 @@ contains
   end SUBROUTINE def_nf90_bnds_dimvars
   
   
-  SUBROUTINE def_nf90_bnds_var(ncid, varname, dimid_nv, varid)
+  
+  SUBROUTINE def_nf90_bnds_var(ncid, varname, dimid_nv, varid, deflate)
   
     integer,            intent(in)  :: ncid
-    character(len=*), intent(in)  :: varname ! size: ndims
+    character(len=*),   intent(in)  :: varname ! size: ndims
     integer,            intent(in)  :: dimid_nv
     integer,            intent(OUT) :: varid ! size: ndims
+    integer,  optional, intent(in)  :: deflate
     
     ! iterator
     integer :: i
@@ -1604,6 +1604,11 @@ contains
     
     nf_stat = nf90_def_var(ncid, trim(varname)//'_bnds', tmp_type, dimids_bnds, varid)
     call check_nf90_stat(nf_stat, 'error def var '//trim(varname)//'_bnds')
+    
+    if (present(deflate)) then
+      nf_stat = nf90_def_var_deflate(ncid, varid, 0, 1, deflate)
+      call check_nf90_stat(nf_stat, 'error set deflate for var '//trim(varname)//'_bnds')
+    end if
     
     ! copy fillvalue
     nf_stat = nf90_copy_att(ncid, tmp_varid, '_FillValue', ncid, varid)
