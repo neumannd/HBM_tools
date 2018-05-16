@@ -1452,6 +1452,12 @@ contains
     nf_stat = nf90_put_att(ncid, varid, 'positive', 'down')
     Call check_nf90_stat(nf_stat, 'set positive attribute of var '//trim(varname))
     
+    nf_stat = nf90_put_att(ncid, varid, '_FillValue', 0.0_4)
+    call check_nf90_stat(nf_stat, 'error put att _FillValue of var '//trim(varname))
+    
+    nf_stat = nf90_put_att(ncid, varid, 'missing_value', 0.0_4)
+    call check_nf90_stat(nf_stat, 'error put att missing_value of var '//trim(varname))
+    
   END SUBROUTINE modify_nf90_attributes_depth
   
   
@@ -1497,10 +1503,12 @@ contains
                            'and possibly waves.')
     call check_nf90_stat(nf_stat, 'error put att description of var '//trim(varname))
     
-    nf_stat = nf90_put_att(ncid, varid, '_FillValue', real(fillval))
+    ! nf_stat = nf90_put_att(ncid, varid, '_FillValue', real(fillval))
+    nf_stat = nf90_put_att(ncid, varid, '_FillValue', 0.0_4)
     call check_nf90_stat(nf_stat, 'error put att _FillValue of var '//trim(varname))
     
-    nf_stat = nf90_put_att(ncid, varid, 'missing_value', real(fillval))
+    ! nf_stat = nf90_put_att(ncid, varid, 'missing_value', real(fillval))
+    nf_stat = nf90_put_att(ncid, varid, 'missing_value', 0.0_4)
     call check_nf90_stat(nf_stat, 'error put att missing_value of var '//trim(varname))
     
     
@@ -1634,11 +1642,17 @@ contains
       call check_nf90_stat(nf_stat, 'error set deflate for var '//trim(varname)//'_bnds')
     end if
     
-    !! REMOVED; bounds variables should have no attributes
-    ! copy fillvalue
-    !nf_stat = nf90_copy_att(ncid, tmp_varid, '_FillValue', ncid, varid)
-    ! call check_nf90_stat(nf_stat, 'error copy att _FillValue of var '//trim(varname))
-    !nf_stat = nf90_copy_att(ncid, tmp_varid, 'missing_value', ncid, varid)
+    !!!! REMOVED; bounds variables should have no attributes
+    !! copy fillvalue
+    !!nf_stat = nf90_copy_att(ncid, tmp_varid, '_FillValue', ncid, varid)
+    !! call check_nf90_stat(nf_stat, 'error copy att _FillValue of var '//trim(varname))
+    !!nf_stat = nf90_copy_att(ncid, tmp_varid, 'missing_value', ncid, varid)
+    !! call check_nf90_stat(nf_stat, 'error put att missing_value of var '//trim(varname))
+    
+    ! nf_stat = nf90_put_att(ncid, tmp_varid, '_FillValue', 0.0_4)
+    ! call check_nf90_stat(nf_stat, 'error put att _FillValue of var '//trim(varname))
+    ! 
+    ! nf_stat = nf90_put_att(ncid, tmp_varid, 'missing_value', 0.0_4)
     ! call check_nf90_stat(nf_stat, 'error put att missing_value of var '//trim(varname))
   
   end SUBROUTINE def_nf90_bnds_var

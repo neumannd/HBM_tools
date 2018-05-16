@@ -344,9 +344,12 @@ contains
       
     else 
       
-      depth = fillval
-      depth_bnds = fillval
-      bathy = fillval
+      ! depth = fillval
+      ! depth_bnds = fillval
+      ! bathy = fillval
+      depth = 0.0_8
+      depth_bnds = 0.0_8
+      bathy = 0.0_8
       
       ! We do not iterate in the proper order in which the data are located
       ! in the memory. This would we TIME, DEPTH, LAT, and LON (TIME outer
@@ -381,7 +384,8 @@ contains
             end do
             
             if (iZ .eq. 1) then
-              bathy(iLo, iLa, iTi) = fillval
+              # bathy(iLo, iLa, iTi) = fillval
+              bathy(iLo, iLa, iTi) = 0.0_8
             end if
             
             if (iZ .eq. nZ+1) then
