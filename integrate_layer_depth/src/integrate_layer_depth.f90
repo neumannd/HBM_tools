@@ -384,7 +384,7 @@ contains
             end do
             
             if (iZ .eq. 1) then
-              # bathy(iLo, iLa, iTi) = fillval
+              ! bathy(iLo, iLa, iTi) = fillval
               bathy(iLo, iLa, iTi) = 0.0_8
             end if
             
