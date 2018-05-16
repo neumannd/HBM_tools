@@ -200,12 +200,12 @@ program integrate_layer_depth
     ! write variables
     write(*,*) '~~~~ WRITE new variables into output file'
     nf_stat = NF90_PUT_VAR(ncid_ot, id_v_depth, val_v_depth)
-    call check_nf90_stat(nf_stat, 'error put var real_depth')
+    call check_nf90_stat(nf_stat, 'error put var depth')
     
     nf_stat = NF90_PUT_VAR(ncid_ot, id_v_bathy, val_v_bathy)
     call check_nf90_stat(nf_stat, 'error put var bathymetry')
     nf_stat = NF90_PUT_VAR(ncid_ot, id_v_depth_bnds, val_v_depth_bnds)
-    call check_nf90_stat(nf_stat, 'error put var real_depth_bnds')
+    call check_nf90_stat(nf_stat, 'error put var depth_bnds')
     
     
     write(*,*) 'FINISHED writing; CLOSING input and output files; CLEANING up'

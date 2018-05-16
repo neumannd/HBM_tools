@@ -1440,7 +1440,7 @@ contains
     
     nf_stat = nf90_del_att(ncid, varid, 'unit_long')
     
-    nf_stat = nf90_put_att(ncid, varid, 'cell_methods', 'time: point within hours time: mean over hours')
+    nf_stat = nf90_put_att(ncid, varid, 'cell_methods', 'time: mean (interval: 1 hour)')
     Call check_nf90_stat(nf_stat, 'set cell_methods attribute of var '//trim(varname))
     
     nf_stat = nf90_put_att(ncid, varid, 'standard_name', 'depth')
@@ -1486,6 +1486,9 @@ contains
     nf_stat = nf90_put_att(ncid, varid, 'units', 'm')
     call check_nf90_stat(nf_stat, 'error put att units of var '//trim(varname))
     
+    nf_stat = nf90_put_att(ncid, varid, 'positive', 'down')
+    Call check_nf90_stat(nf_stat, 'set positive attribute of var '//trim(varname))
+    
     nf_stat = nf90_put_att(ncid, varid, 'description', 'The '//&
                            'sea_floor_depth_below_sea_surface is the '//&
                            'vertical distance between the sea surface and '//&
@@ -1522,8 +1525,10 @@ contains
     
     ! tmp vars
     integer                              :: tmp_type, tmp_varid, tmp_ntime
-    real(8), dimension(:,:), allocatable :: tmp_time_bnds
-    real(8), dimension(:), allocatable   :: tmp_time
+    real(8), dimension(:,:), allocatable :: tmp_time_bnds_dbl
+    real(4), dimension(:,:), allocatable :: tmp_time_bnds_flt
+    real(8), dimension(:), allocatable   :: tmp_time_dbl
+    real(4), dimension(:), allocatable   :: tmp_time_flt
     
     ! allocate output
     ALLOCATE(varids(ndims))
@@ -1543,17 +1548,36 @@ contains
         nf_stat =  nf90_inquire_dimension(ncid, dimids(i), len = tmp_ntime)
         call check_nf90_stat(nf_stat, 'error inq dim len for dim '//trim(names(i)))
         
-        allocate(tmp_time_bnds(2, tmp_ntime), tmp_time(tmp_ntime))
+        allocate(tmp_time_bnds_dbl(2, tmp_ntime), tmp_time_dbl(tmp_ntime))
         
-        nf_stat = nf90_get_var(ncid, tmp_varid, tmp_time)
+        nf_stat = nf90_get_var(ncid, tmp_varid, tmp_time_dbl)
         call check_nf90_stat(nf_stat, 'error get values of variable '//trim(names(i)))
         
         DO j = 1, tmp_ntime
-          tmp_time_bnds(1,j) = floor(tmp_time(j))
-          tmp_time_bnds(2,j) = ceiling(tmp_time(j))
+          tmp_time_bnds_dbl(1,j) = floor(tmp_time_dbl(j))
+          tmp_time_bnds_dbl(2,j) = ceiling(tmp_time_dbl(j))
         end do
         
-        nf_stat = nf90_put_var(ncid, varids(i), tmp_time_bnds)
+        nf_stat = nf90_put_var(ncid, varids(i), tmp_time_bnds_dbl)
+        call check_nf90_stat(nf_stat, 'error put values of variable '//trim(names(i)))
+        
+      end if
+      
+      if ((trim(names(i)) .eq. 'time') .and. (tmp_type .eq. NF90_FLOAT)) then
+        nf_stat =  nf90_inquire_dimension(ncid, dimids(i), len = tmp_ntime)
+        call check_nf90_stat(nf_stat, 'error inq dim len for dim '//trim(names(i)))
+        
+        allocate(tmp_time_bnds_flt(2, tmp_ntime), tmp_time_flt(tmp_ntime))
+        
+        nf_stat = nf90_get_var(ncid, tmp_varid, tmp_time_flt)
+        call check_nf90_stat(nf_stat, 'error get values of variable '//trim(names(i)))
+        
+        DO j = 1, tmp_ntime
+          tmp_time_bnds_flt(1,j) = floor(tmp_time_flt(j))
+          tmp_time_bnds_flt(2,j) = ceiling(tmp_time_flt(j))
+        end do
+        
+        nf_stat = nf90_put_var(ncid, varids(i), tmp_time_bnds_flt)
         call check_nf90_stat(nf_stat, 'error put values of variable '//trim(names(i)))
         
       end if
@@ -1610,10 +1634,11 @@ contains
       call check_nf90_stat(nf_stat, 'error set deflate for var '//trim(varname)//'_bnds')
     end if
     
+    !! REMOVED; bounds variables should have no attributes
     ! copy fillvalue
-    nf_stat = nf90_copy_att(ncid, tmp_varid, '_FillValue', ncid, varid)
+    !nf_stat = nf90_copy_att(ncid, tmp_varid, '_FillValue', ncid, varid)
     ! call check_nf90_stat(nf_stat, 'error copy att _FillValue of var '//trim(varname))
-    nf_stat = nf90_copy_att(ncid, tmp_varid, 'missing_value', ncid, varid)
+    !nf_stat = nf90_copy_att(ncid, tmp_varid, 'missing_value', ncid, varid)
     ! call check_nf90_stat(nf_stat, 'error put att missing_value of var '//trim(varname))
   
   end SUBROUTINE def_nf90_bnds_var
