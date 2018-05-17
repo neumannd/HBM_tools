@@ -148,6 +148,8 @@ contains
     
     ! get the dimid of the record dimension
     nf_stat = nf90_inquire(ncid_in, unlimitedDimId = id_d_rec)
+    call check_nf90_stat(nf_stat, 'error getting record dim of input file')
+    
     
     ! count number of output dimensions and allocate arrays
     n_d_ot = 0
@@ -326,6 +328,7 @@ contains
     integer                            :: id_v_in, id_v_ot, n_dims_in, n_dims_ot
     integer, dimension(:), allocatable :: start_ot, count_ot, start_in, count_in
     integer, dimension(:), allocatable :: id_dims_in, id_dims_ot
+    integer                            :: id_d_in_rec, id_d_ot_rec ! record dimension ID
     
     ! iterators
     integer :: i
@@ -335,6 +338,13 @@ contains
     
     ! output dimname
     CHARACTER(LEN=255) :: dimname_ot
+    
+    
+    ! get the dimid of the record dimension
+    nf_stat = nf90_inquire(ncid_in, unlimitedDimId = id_d_in_rec)
+    call check_nf90_stat(nf_stat, 'error getting record dim of input file')
+    nf_stat = nf90_inquire(ncid_ot, unlimitedDimId = id_d_ot_rec)
+    call check_nf90_stat(nf_stat, 'error getting record dim of output file')
     
     
     if (present(new_dimname)) THEN
@@ -368,12 +378,6 @@ contains
     allocate(start_in(n_dims_in), count_in(n_dims_in), &
               start_ot(n_dims_ot), count_ot(n_dims_ot))
     
-    start_ot = 1
-    do i = 1, n_dims_ot
-      nf_stat = NF90_INQUIRE_DIMENSION(ncid_ot, id_dims_ot(i), len = count_ot(i))
-      call check_nf90_stat(nf_stat, 'error inq dim len of one dim of var '//trim(dimname_ot))
-    end do
-    
     do i = 1, n_dims_in
       start_in(i) = start(id_dims_in(i))
       count_in(i) = count(id_dims_in(i))
@@ -381,6 +385,19 @@ contains
         nf_stat = NF90_INQUIRE_DIMENSION(ncid_in, id_dims_in(i), len = count_in(i))
         call check_nf90_stat(nf_stat, 'error inq dim len of one dim of var '//trim(dimname))
       end if
+    end do
+    
+    start_ot = 1
+    do i = 1, n_dims_ot
+      ! if i is record dimension we cannot get the dimension size => it is currently 0
+      IF (id_dims_ot(i) .eq. id_d_ot_rec) THEN
+        ! NOTE: we get the record dimension size from the input file
+        nf_stat = NF90_INQUIRE_DIMENSION(ncid_in, id_d_in_rec, len = count_ot(i))
+        call check_nf90_stat(nf_stat, 'error inq dim len of one dim of var '//trim(dimname))
+      ELSE
+        nf_stat = NF90_INQUIRE_DIMENSION(ncid_ot, id_dims_ot(i), len = count_ot(i))
+        call check_nf90_stat(nf_stat, 'error inq dim len of one dim of var '//trim(dimname_ot))
+      END IF
     end do
     
     ! copy the dimensional variable
@@ -1377,9 +1394,15 @@ contains
     
     nf_stat = nf90_del_att(ncid, tmp_varid, 'units')
     nf_stat = nf90_del_att(ncid, tmp_varid, 'units_long')
-    nf_stat = nf90_del_att(ncid, tmp_varid, 'standard_name')
-    nf_stat = nf90_del_att(ncid, tmp_varid, 'long_name')
-    nf_stat = nf90_del_att(ncid, tmp_varid, 'units_long')
+    nf_stat = nf90_del_att(ncid, tmp_varid, 'unit_long')
+    ! nf_stat = nf90_del_att(ncid, tmp_varid, 'standard_name')
+    ! nf_stat = nf90_del_att(ncid, tmp_varid, 'long_name')
+    
+    nf_stat = nf90_put_att(ncid, tmp_varid, 'standard_name', 'model_level_number')
+    Call check_nf90_stat(nf_stat, 'set standard_name attribute of var '//trim(tmp_varname))
+    
+    nf_stat = nf90_put_att(ncid, tmp_varid, 'long_name', 'model_level_number')
+    Call check_nf90_stat(nf_stat, 'set long_name attribute of var '//trim(tmp_varname))
     
     nf_stat = nf90_put_att(ncid, tmp_varid, 'axis', 'Z')
     Call check_nf90_stat(nf_stat, 'set axis attribute of var '//trim(tmp_varname))
@@ -1541,6 +1564,7 @@ contains
     ! allocate output
     ALLOCATE(varids(ndims))
     
+    
     DO i = 1, ndims
       
       nf_stat = nf90_inq_varid(ncid, names(i), tmp_varid)
@@ -1553,6 +1577,9 @@ contains
       call check_nf90_stat(nf_stat, 'error put att bounds of var '//trim(names(i)))
       
       if ((trim(names(i)) .eq. 'time') .and. (tmp_type .eq. NF90_DOUBLE)) then
+        nf_stat = nf90_enddef(ncid)
+        call check_nf90_stat(nf_stat, 'error leaving definition mode')
+        
         nf_stat =  nf90_inquire_dimension(ncid, dimids(i), len = tmp_ntime)
         call check_nf90_stat(nf_stat, 'error inq dim len for dim '//trim(names(i)))
         
@@ -1569,9 +1596,15 @@ contains
         nf_stat = nf90_put_var(ncid, varids(i), tmp_time_bnds_dbl)
         call check_nf90_stat(nf_stat, 'error put values of variable '//trim(names(i)))
         
+        nf_stat = nf90_redef(ncid)
+        call check_nf90_stat(nf_stat, 'error entering definition mode')
+        
       end if
       
       if ((trim(names(i)) .eq. 'time') .and. (tmp_type .eq. NF90_FLOAT)) then
+        nf_stat = nf90_enddef(ncid)
+        call check_nf90_stat(nf_stat, 'error leaving definition mode')
+        
         nf_stat =  nf90_inquire_dimension(ncid, dimids(i), len = tmp_ntime)
         call check_nf90_stat(nf_stat, 'error inq dim len for dim '//trim(names(i)))
         
@@ -1587,6 +1620,9 @@ contains
         
         nf_stat = nf90_put_var(ncid, varids(i), tmp_time_bnds_flt)
         call check_nf90_stat(nf_stat, 'error put values of variable '//trim(names(i)))
+        
+        nf_stat = nf90_redef(ncid)
+        call check_nf90_stat(nf_stat, 'error entering definition mode')
         
       end if
       
