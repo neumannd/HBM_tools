@@ -144,7 +144,7 @@ program integrate_layer_depth
     call get_nf90_dim_infos (ncid_ot, dimnames_ot, 4, id_dims_ot, len_dims_ot)
     call correct_nf90_attributes_integrate_layer_depths(ncid_ot)
     nf_stat = NF90_DEF_DIM(ncid_ot, 'nv', 2, id_dim_nv)
-        call check_nf90_stat(nf_stat, 'error defining dim')
+    call check_nf90_stat(nf_stat, 'error defining dim')
     
     ! copy variable definitions
     CALL copy_nf90_variable_def(ncid_in, ncid_ot, 'h', (/'depth'/), 1, id_dims_ot, &
