@@ -166,9 +166,11 @@ program integrate_layer_depth
     
     
     ! define bounds variables
+    !   define time_bnds variable
     CALL def_nf90_bnds_dimvars(ncid_ot, (/dimnames_ot(4)/), &
                                (/id_dims_ot(4)/), 1, &
                                id_dim_nv, id_varbndsdims_ot)
+    !   define but do not fill depth_bnds variable
     CALL def_nf90_bnds_var(ncid_ot, 'depth', id_dim_nv, id_v_depth_bnds, deflate = 1)
     
     
@@ -199,11 +201,13 @@ program integrate_layer_depth
     
     ! write variables
     write(*,*) '~~~~ WRITE new variables into output file'
+    ! put 'depth' variable
     nf_stat = NF90_PUT_VAR(ncid_ot, id_v_depth, val_v_depth)
     call check_nf90_stat(nf_stat, 'error put var depth')
-    
+    ! put 'bathymetry' variable
     nf_stat = NF90_PUT_VAR(ncid_ot, id_v_bathy, val_v_bathy)
     call check_nf90_stat(nf_stat, 'error put var bathymetry')
+    ! put 'depth_bnds' variable
     nf_stat = NF90_PUT_VAR(ncid_ot, id_v_depth_bnds, val_v_depth_bnds)
     call check_nf90_stat(nf_stat, 'error put var depth_bnds')
     

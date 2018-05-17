@@ -38,7 +38,8 @@ module nf90_tools_integrate_layer_depth
 
 contains
   
-  
+  ! ~~~~~~~~~~~~~~~~~~~~~~~~~ get_nf90_dim_infos ~~~~~~~~~~~~~~~~~~~~~~~~~
+  ! Returns ids and lengths of dimensions corresponding to provided names.
   subroutine get_nf90_dim_infos (ncid, dimnames, ndim, dimids, dimlens)
   
     integer,                                      INTENT(IN)  :: ncid
@@ -71,9 +72,12 @@ contains
     END DO
     
   end subroutine get_nf90_dim_infos
+  ! ~~~~~~~~~~~~~~~~~~~~~~~~~ get_nf90_dim_infos ~~~~~~~~~~~~~~~~~~~~~~~~~
   
   
   
+  ! ~~~~~~~~~~~~~~~~~~~~~~~~~ get_nf90_var_infos ~~~~~~~~~~~~~~~~~~~~~~~~~
+  ! Returns ids of variables corresponding to provided names.
   subroutine get_nf90_var_infos (ncid, varnames, nvar, varids)
   
     integer,                                      INTENT(IN)  :: ncid
@@ -102,6 +106,7 @@ contains
     END DO
     
   end subroutine get_nf90_var_infos
+  ! ~~~~~~~~~~~~~~~~~~~~~~~~~ get_nf90_var_infos ~~~~~~~~~~~~~~~~~~~~~~~~~
   
   
   
@@ -233,7 +238,7 @@ contains
   !~ subroutine copy_nf90_dimensional_variables(ncid_in, ncid_ot, start, count, id_d_ot)
   
   
-  
+    !!! NOT CREATED AS INTENDED
   
   
   !~ end subroutine copy_nf90_dimensional_variables
@@ -474,15 +479,22 @@ contains
         end if
       end do
       
+      ! If 'comments' is provided to the function call, a 'comments' attribute
+      ! is created and filled with the value of that variable.
       if (present(comments)) then
         call append_NF90_attribute(ncid_ot, id_v_ot, 'comment', comments(icopy))
       end if
       
+      ! If 'new_units' is provided to the function call, a 'units' attribute
+      ! is created or overwritten -- and filled with the value of that variable.
       if (present(new_units)) then
         nf_stat = NF90_PUT_ATT(ncid_ot, id_v_ot, 'units', new_units)
           call check_nf90_stat(nf_stat, 'error put units '//trim(new_units))
       end if
     
+      
+      ! If 'deflate' is provided to the function call, the variable is deflated
+      ! with the level given in the 'deflate' variable.
       if (present(deflate)) then
         nf_stat = nf90_def_var_deflate(ncid_ot, id_v_ot, 0, 1, deflate)
         call check_nf90_stat(nf_stat, 'error set deflate for var '//trim(vars_ot(icopy)))
@@ -1071,23 +1083,27 @@ contains
     
     
     ! copy attributes
+    !  copy units
     nf_stat = nf90_copy_att(ncid_in, id_v_in, 'units', ncid_ot, id_v_ot)
     call check_nf90_stat(nf_stat, 'error copy attribute units from var '//&
                           trim(varname_in)//' to var '//trim(varname_ot))
                           
+    !  copy standard_name
     nf_stat = nf90_copy_att(ncid_in, id_v_in, 'standard_name', ncid_ot, id_v_ot)
     call check_nf90_stat(nf_stat, 'error copy attribute standard_name from var '//&
                           trim(varname_in)//' to var '//trim(varname_ot))
                           
+    !  copy long_name
     nf_stat = nf90_copy_att(ncid_in, id_v_in, 'long_name', ncid_ot, id_v_ot)
     call check_nf90_stat(nf_stat, 'error copy attribute long_name from var '//&
                           trim(varname_in)//' to var '//trim(varname_ot))
                           
+    !  copy axis
     nf_stat = nf90_copy_att(ncid_in, id_v_in, 'axis', ncid_ot, id_v_ot)
     call check_nf90_stat(nf_stat, 'error copy attribute axis from var '//&
                           trim(varname_in)//' to var '//trim(varname_ot))
     
-    
+    ! If the input variable name is depth, we copy the attribute 'positive'.
     if (trim(varname_in) .eq. 'depth') then
       nf_stat = nf90_copy_att(ncid_in, id_v_in, 'positive', ncid_ot, id_v_ot)
       call check_nf90_stat(nf_stat, 'error copy attribute positive from var '//&
@@ -1129,21 +1145,27 @@ contains
     
     
     ! copy attributes
+    !  copy longitude_min
     nf_stat = nf90_copy_att(ncid_in, NF90_GLOBAL, 'longitude_min', ncid_ot, NF90_GLOBAL)
     call check_nf90_stat(nf_stat, 'error copy global attribute longitude_min')
                           
+    !  copy longitude_max
     nf_stat = nf90_copy_att(ncid_in, NF90_GLOBAL, 'longitude_max', ncid_ot, NF90_GLOBAL)
     call check_nf90_stat(nf_stat, 'error copy global attribute longitude_max')
                           
+    !  copy latitude_min
     nf_stat = nf90_copy_att(ncid_in, NF90_GLOBAL, 'latitude_min', ncid_ot, NF90_GLOBAL)
     call check_nf90_stat(nf_stat, 'error copy global attribute latitude_min')
                           
+    !  copy latitude_max
     nf_stat = nf90_copy_att(ncid_in, NF90_GLOBAL, 'latitude_max', ncid_ot, NF90_GLOBAL)
     call check_nf90_stat(nf_stat, 'error copy global attribute latitude_max')
                           
+    !  copy depth_min
     nf_stat = nf90_copy_att(ncid_in, NF90_GLOBAL, 'depth_min', ncid_ot, NF90_GLOBAL)
     call check_nf90_stat(nf_stat, 'error copy global attribute depth_min')
                           
+    !  copy depth_max
     nf_stat = nf90_copy_att(ncid_in, NF90_GLOBAL, 'depth_max', ncid_ot, NF90_GLOBAL)
     call check_nf90_stat(nf_stat, 'error copy global attribute depth_max')
     
@@ -1182,20 +1204,25 @@ contains
     
     
     ! set global attributes
+    !  set 'Conventions'
     nf_stat = nf90_put_att(ncid_ot, NF90_GLOBAL, 'Conventions', 'CF-1.7')
     call check_nf90_stat(nf_stat, 'put global att Conventions')
     
+    !  set 'source'
     nf_stat = nf90_put_att(ncid_ot, NF90_GLOBAL, 'source', &
                            'HIROMB-BOOS-model input')
     call check_nf90_stat(nf_stat, 'put global att source')
     
+    !  set 'title'
     nf_stat = nf90_put_att(ncid_ot, NF90_GLOBAL, 'title', &
                            'depth of HBM model grid cells')
     call check_nf90_stat(nf_stat, 'put global att title')
     
+    !  set 'institution'
     nf_stat = nf90_put_att(ncid_ot, NF90_GLOBAL, 'institution', 'BSH and IOW')
     call check_nf90_stat(nf_stat, 'put global att institution')
     
+    !  append to 'history'
     nf_stat = nf90_inquire_attribute(ncid_in, NF90_GLOBAL, 'history', len=tmp_int)
     call check_nf90_stat(nf_stat, 'inq global att history')
     allocate(character(len=tmp_int) :: tmp_string_dyn)
@@ -1204,6 +1231,7 @@ contains
     nf_stat = nf90_put_att(ncid_ot, NF90_GLOBAL, 'history', trim(tmp_string_dyn)//';   '//history)
     call check_nf90_stat(nf_stat, 'put global att history')
     
+    !  add 'comment'
     nf_stat = nf90_put_att(ncid_ot, NF90_GLOBAL, 'comment', &
                            'created by Daniel Neumann (IOW) from HBM layer'//&
                            ' thickness model output data provided by BSH'//&
@@ -1223,6 +1251,7 @@ contains
   
   
   ! ~~~~~~~~~~~~~~~~~~~~~~~~~ get_NF90_fillvalue_real8 ~~~~~~~~~~~~~~~~~~~~~~
+  ! Obtain the fill value of a variable
   function get_NF90_fillvalue_real8(ncid, varid, fillval)
   
     integer, intent(in) :: ncid, varid
@@ -1238,22 +1267,30 @@ contains
     ! init
     get_NF90_fillvalue_real8 = 0
     
-  
+    ! get '_FillValue'
     nf_stat = nf90_get_att(ncid, varid, '_FillValue', fillval)
+    
+    ! if '_FillValue' does not exist (error == -43), then ...
     if ( nf_stat .eq. -43 ) then
       write(*,*) 'Warning: attribute _FillValue not found for variable. '//&
                   'Trying missing_value.'
+      ! ... get 'missing_value'
       nf_stat = nf90_get_att(ncid, varid, 'missing_value', fillval)
+      
+      ! if 'missing_value' does not exist (error == -43), then ...
       if ( nf_stat .eq. -43 ) then
+        
+        ! ... throw a warning
         write(*,*) 'Warning: attribute missing_value not found for variable. '//&
                     'Using no _FillValue'
         get_NF90_fillvalue_real8 = -43
-      else
+      else ! missing_value yields (error != -43)
         call check_nf90_stat(nf_stat, 'error get att missing_value of var')
-      end if
-    else
+      end if ! missing_value error
+      
+    else ! _FillValue yields (error != -43)
       call check_nf90_stat(nf_stat, 'error get att _FillValue of var')
-    end if
+    end if ! _FillValue error
   
   end function get_NF90_fillvalue_real8
   ! ~~~~~~~~~~~~~~~~~~~~~~~~~ get_NF90_fillvalue_real8 ~~~~~~~~~~~~~~~~~~~~~~
@@ -1274,21 +1311,22 @@ contains
     ! status
     integer :: nf_stat
     
-  
-    nf_stat = nf90_inquire_attribute(ncid, varid, 'history', len=attlen)
+    
+    nf_stat = nf90_inquire_attribute(ncid, varid, attname, len=attlen)
+    ! call check_nf90_stat(nf_stat, 'get length of attribte '//trim(attname))
     
     ! check, whether attribute exists (then nf_stat == 0) or not (then nf_stat == -43)
     if (nf_stat .eq. -43) then
-      nf_stat = NF90_PUT_ATT(ncid, varid, 'comment', attvalue)
-      call check_nf90_stat(nf_stat, 'put attribte comment')
+      nf_stat = NF90_PUT_ATT(ncid, varid, attname, attvalue)
+      call check_nf90_stat(nf_stat, 'put attribte '//trim(attname))
     else
       
-      call check_nf90_stat(ncid, 'inq att comment')
+      call check_nf90_stat(ncid, 'inq att '//trim(attname))
       allocate(character(len=attlen) :: tmp_string_dyn)
-      nf_stat = nf90_get_att(ncid, varid, 'comment', tmp_string_dyn)
-      call check_nf90_stat(nf_stat, 'get global att comment')
-      nf_stat = nf90_put_att(ncid, varid, 'comment', trim(tmp_string_dyn)//';   '//attvalue)
-      call check_nf90_stat(nf_stat, 'put global att comment')
+      nf_stat = nf90_get_att(ncid, varid, attname, tmp_string_dyn)
+      call check_nf90_stat(nf_stat, 'get global att '//trim(attname))
+      nf_stat = nf90_put_att(ncid, varid, attname, trim(tmp_string_dyn)//';   '//attvalue)
+      call check_nf90_stat(nf_stat, 'put global att '//trim(attname))
       
     end if
     
@@ -1374,6 +1412,7 @@ contains
   
   
   
+  ! ~~~~~~~~~~~~~~~~~~~~~~~~~ correct_nf90_attributes_integrate_layer_depths ~~~~~~~~~~~~~~~~~~~~~~~~~
   SUBROUTINE correct_nf90_attributes_integrate_layer_depths(ncid)
   
     integer, intent(in) :: ncid
@@ -1440,9 +1479,11 @@ contains
     
   
   END SUBROUTINE correct_nf90_attributes_integrate_layer_depths
+  ! ~~~~~~~~~~~~~~~~~~~~~~~~~ correct_nf90_attributes_integrate_layer_depths ~~~~~~~~~~~~~~~~~~~~~~~~~
   
   
   
+  ! ~~~~~~~~~~~~~~~~~~~~~~~~~ modify_nf90_attributes_depth ~~~~~~~~~~~~~~~~~~~~~~~~~
   SUBROUTINE modify_nf90_attributes_depth(ncid)
   
     integer, intent(in) :: ncid
@@ -1482,9 +1523,11 @@ contains
     call check_nf90_stat(nf_stat, 'error put att missing_value of var '//trim(varname))
     
   END SUBROUTINE modify_nf90_attributes_depth
+  ! ~~~~~~~~~~~~~~~~~~~~~~~~~ modify_nf90_attributes_depth ~~~~~~~~~~~~~~~~~~~~~~~~~
   
   
   
+  ! ~~~~~~~~~~~~~~~~~~~~~~~~~ modify_nf90_attributes_bathymetry ~~~~~~~~~~~~~~~~~~~~~~~~~
   SUBROUTINE modify_nf90_attributes_bathymetry(ncid, fillval)
   
     integer, intent(in) :: ncid
@@ -1536,17 +1579,27 @@ contains
     
     
   END SUBROUTINE modify_nf90_attributes_bathymetry
+  ! ~~~~~~~~~~~~~~~~~~~~~~~~~ modify_nf90_attributes_bathymetry ~~~~~~~~~~~~~~~~~~~~~~~~~
   
   
   
+  ! ~~~~~~~~~~~~~~~~~~~~~~~~~ def_nf90_bnds_dimvars ~~~~~~~~~~~~~~~~~~~~~~~~~
+  ! Iterates all variables in 'names' and creates a bounds variable for them.
+  ! Each create variable has:
+  !   - the name names(i)//'_bnds'.
+  !   - no attributes.
+  !   - the same dimensions as the original variable plus the dimension
+  !       dimid_nv. This dimension should have the length 2 (1x lower bound, 
+  !       1x upper bound).
+  ! !!! ONLY IMPLEMENTED FOR DOUBLE AND FLOAT VARIABLES !!!
   SUBROUTINE def_nf90_bnds_dimvars(ncid, names, dimids, ndims, dimid_nv, varids)
   
-    integer,                                       intent(in)  :: ncid
+    integer,                                     intent(in)  :: ncid
     character(len=*), dimension(:),              intent(in)  :: names ! size: ndims
-    integer,            dimension(:),              intent(in)  :: dimids ! size: ndims
-    integer,                                       intent(in)  :: ndims
-    integer,                                       intent(in)  :: dimid_nv
-    integer,            dimension(:), ALLOCATABLE, intent(OUT) :: varids ! size: ndims
+    integer,          dimension(:),              intent(in)  :: dimids ! size: ndims
+    integer,                                     intent(in)  :: ndims
+    integer,                                     intent(in)  :: dimid_nv
+    integer,          dimension(:), ALLOCATABLE, intent(OUT) :: varids ! size: ndims
     
     ! iterator
     integer :: i, j
@@ -1565,62 +1618,99 @@ contains
     ALLOCATE(varids(ndims))
     
     
+    ! iterate all names
     DO i = 1, ndims
       
+      ! get var id of original variable
       nf_stat = nf90_inq_varid(ncid, names(i), tmp_varid)
       call check_nf90_stat(nf_stat, 'error inq varid for var '//trim(names(i)))
+      
+      ! get type of original variable
       nf_stat = nf90_inquire_variable(ncid, tmp_varid, xtype = tmp_type)
       call check_nf90_stat(nf_stat, 'error type for var '//trim(names(i)))
+      
+      ! define new bounds variable
       nf_stat = nf90_def_var(ncid, trim(names(i))//'_bnds', tmp_type, (/dimid_nv, dimids(i)/), varids(i))
       call check_nf90_stat(nf_stat, 'error def var '//trim(names(i))//'_bnds')
+      
+      ! create 'bounds' attribute at original variable to point to the bnds variable
       nf_stat = nf90_put_att(ncid, tmp_varid, 'bounds', trim(names(i))//'_bnds')
       call check_nf90_stat(nf_stat, 'error put att bounds of var '//trim(names(i)))
       
+      ! If the variable is 'time' and type of DOUBLE, we copy values to the bounds variable.
       if ((trim(names(i)) .eq. 'time') .and. (tmp_type .eq. NF90_DOUBLE)) then
+      
+        ! leave definition mode
         nf_stat = nf90_enddef(ncid)
         call check_nf90_stat(nf_stat, 'error leaving definition mode')
         
+        ! get size of time variable
         nf_stat =  nf90_inquire_dimension(ncid, dimids(i), len = tmp_ntime)
         call check_nf90_stat(nf_stat, 'error inq dim len for dim '//trim(names(i)))
         
+        ! allocate arrays
         allocate(tmp_time_bnds_dbl(2, tmp_ntime), tmp_time_dbl(tmp_ntime))
         
+        ! get time data
         nf_stat = nf90_get_var(ncid, tmp_varid, tmp_time_dbl)
         call check_nf90_stat(nf_stat, 'error get values of variable '//trim(names(i)))
         
+        ! calculate time bounds
+        !  This is fairly simple in this particular case. HBM-ERGOM writes out
+        !  the time in 'days since ...'. We have daily mean values. The time
+        !  variable contains values, which point to the middle of the day. Thus,
+        !  we round down and up to obtain the lower and upper, respectively, 
+        !  time boundaries for time_bnds.
         DO j = 1, tmp_ntime
           tmp_time_bnds_dbl(1,j) = floor(tmp_time_dbl(j))
           tmp_time_bnds_dbl(2,j) = ceiling(tmp_time_dbl(j))
         end do
         
+        ! put time_bnds data
         nf_stat = nf90_put_var(ncid, varids(i), tmp_time_bnds_dbl)
         call check_nf90_stat(nf_stat, 'error put values of variable '//trim(names(i)))
         
+        ! re-enter definition mode
         nf_stat = nf90_redef(ncid)
         call check_nf90_stat(nf_stat, 'error entering definition mode')
         
       end if
       
+      
+      ! If the variable is 'time' and type of FLOAT, we copy values to the bounds variable.
       if ((trim(names(i)) .eq. 'time') .and. (tmp_type .eq. NF90_FLOAT)) then
+      
+        ! leave definition mode
         nf_stat = nf90_enddef(ncid)
         call check_nf90_stat(nf_stat, 'error leaving definition mode')
         
+        ! get size of time variable
         nf_stat =  nf90_inquire_dimension(ncid, dimids(i), len = tmp_ntime)
         call check_nf90_stat(nf_stat, 'error inq dim len for dim '//trim(names(i)))
         
+        ! allocate arrays
         allocate(tmp_time_bnds_flt(2, tmp_ntime), tmp_time_flt(tmp_ntime))
         
+        ! get time data
         nf_stat = nf90_get_var(ncid, tmp_varid, tmp_time_flt)
         call check_nf90_stat(nf_stat, 'error get values of variable '//trim(names(i)))
         
+        ! calculate time bounds
+        !  This is fairly simple in this particular case. HBM-ERGOM writes out
+        !  the time in 'days since ...'. We have daily mean values. The time
+        !  variable contains values, which point to the middle of the day. Thus,
+        !  we round down and up to obtain the lower and upper, respectively, 
+        !  time boundaries for time_bnds.
         DO j = 1, tmp_ntime
           tmp_time_bnds_flt(1,j) = floor(tmp_time_flt(j))
           tmp_time_bnds_flt(2,j) = ceiling(tmp_time_flt(j))
         end do
         
+        ! put time_bnds data
         nf_stat = nf90_put_var(ncid, varids(i), tmp_time_bnds_flt)
         call check_nf90_stat(nf_stat, 'error put values of variable '//trim(names(i)))
         
+        ! re-enter definition mode
         nf_stat = nf90_redef(ncid)
         call check_nf90_stat(nf_stat, 'error entering definition mode')
         
@@ -1630,9 +1720,17 @@ contains
     
   
   end SUBROUTINE def_nf90_bnds_dimvars
+  ! ~~~~~~~~~~~~~~~~~~~~~~~~~ def_nf90_bnds_dimvars ~~~~~~~~~~~~~~~~~~~~~~~~~
   
   
   
+  ! ~~~~~~~~~~~~~~~~~~~~~~~~~ def_nf90_bnds_var ~~~~~~~~~~~~~~~~~~~~~~~~~
+  ! We define one bounds variable.
+  !   - It has the name varname//'_bnds'.
+  !   - It has no attributes.
+  !   - It has the same dimensions as the original variable plus the dimension
+  !         dimid_nv. This dimension should have the length 2 (1x lower bound, 
+  !         1x upper bound).
   SUBROUTINE def_nf90_bnds_var(ncid, varname, dimid_nv, varid, deflate)
   
     integer,            intent(in)  :: ncid
@@ -1653,26 +1751,39 @@ contains
     ! output dimids
     integer :: ndims
     INTEGER, dimension(:), allocatable :: dimids, dimids_bnds
-      
+    
+    ! get var_id of normal variable
     nf_stat = nf90_inq_varid(ncid, varname, tmp_varid)
     call check_nf90_stat(nf_stat, 'error inq varid for var '//trim(varname))
+    
+    ! get type and number of dimensions of normal variable
     nf_stat = nf90_inquire_variable(ncid, tmp_varid, xtype = tmp_type, ndims = ndims)
     call check_nf90_stat(nf_stat, 'error type for var '//trim(varname))
+    
+    ! allocate array for dimension ids
     allocate(dimids(ndims))
+    
+    ! get dimension ids
     nf_stat = nf90_inquire_variable(ncid, tmp_varid, xtype = tmp_type, dimids = dimids)
     call check_nf90_stat(nf_stat, 'error type for var '//trim(varname))
+    
+    ! create 'bounds' attribute at the original variable, which holds the name of
+    ! the bnds variable.
     nf_stat = nf90_put_att(ncid, tmp_varid, 'bounds', trim(varname)//'_bnds')
     call check_nf90_stat(nf_stat, 'error put att bounds of var '//trim(varname))
     
+    ! add nv-dimension to dim_ids for the bounds variable
     allocate(dimids_bnds(ndims+1))
     dimids_bnds(1) = dimid_nv
     do i = 1, ndims
       dimids_bnds(i+1) = dimids(i)
     end do
     
+    ! define bounds variable
     nf_stat = nf90_def_var(ncid, trim(varname)//'_bnds', tmp_type, dimids_bnds, varid)
     call check_nf90_stat(nf_stat, 'error def var '//trim(varname)//'_bnds')
     
+    ! if deflate is set, deflate the new variable
     if (present(deflate)) then
       nf_stat = nf90_def_var_deflate(ncid, varid, 0, 1, deflate)
       call check_nf90_stat(nf_stat, 'error set deflate for var '//trim(varname)//'_bnds')
@@ -1692,6 +1803,8 @@ contains
     ! call check_nf90_stat(nf_stat, 'error put att missing_value of var '//trim(varname))
   
   end SUBROUTINE def_nf90_bnds_var
+  ! ~~~~~~~~~~~~~~~~~~~~~~~~~ def_nf90_bnds_var ~~~~~~~~~~~~~~~~~~~~~~~~~
+  
   
   
 end module nf90_tools_integrate_layer_depth
