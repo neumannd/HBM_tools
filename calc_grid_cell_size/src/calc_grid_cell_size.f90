@@ -497,18 +497,31 @@ contains
     real(8) :: tmp_depth, tmp_h
     logical :: proceed_depth
     
-    real(8), parameter :: r_earth_eq = 6378.1_8,         &
-                          r_earth_pol = 6356.8_8,        &
-                          dr = r_earth_eq - r_earth_pol, &
-                          r_min = r_earth_pol,           &
-                          pi = 3.141592653589793238_8,   &
-                          deg2rad = pi/180.0_8,          &
-                          dlon = 5.0_8/360.0_8*deg2rad,  &
-                          dlat = 1.0_8/120.0_8*deg2rad
-    real(8)            :: tmp_r, tmp_dx, tmp_dy, tmp_cos_lat
+    real(8), parameter :: r_earth_eq = 6378.1_8,             &
+                          r_earth_pol = 6356.8_8,            &
+                          dr = r_earth_eq - r_earth_pol,     &
+                          r_min = r_earth_pol,               &
+                          pi = 3.141592653589793238_8,       &
+                          deg2rad = pi/180.0_8,              &
+                          dlon_fine = 5.0_8/360.0_8*deg2rad, &
+                          dlat_fine = 1.0_8/120.0_8*deg2rad, &
+                          dlon_coarse = 5.0_8/60.0_8*deg2rad,&
+                          dlat_coarse = 0.05_8*deg2rad
+    real(8)            :: tmp_r, tmp_dx, tmp_dy, tmp_cos_lat, dlon, dlat
     
     nLo = count(1)
     nLa = count(2)
+    
+    if ( (nLo .eq. 414) .and. (nLa .eq. 347) ) THEN
+      dlon = dlon_coarse
+      dlat = dlat_coarse
+    ELSE IF ( (nLo .eq. 630) .and. (nLa .eq. 387) ) THEN
+      dlon = dlon_fine
+      dlat = dlat_fine
+    ELSE
+      write(*,*) 'ERROR: strange grid definition!'
+      stop
+    END IF
 
     ! Placed as atmos dep in one grid cell of the fine grid. Grid cell data:
     !   phi:   55 deg N
