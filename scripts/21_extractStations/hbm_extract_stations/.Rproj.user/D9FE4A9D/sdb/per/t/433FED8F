@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "extract_tag_data = function(dataIn, extractTag, removeTags, sep = '_') {\n  dataOut = list()\n  \n  allNames = names(dataIn)\n  removeExpr = paste(removeTags, collapse='|')\n  \n  removeIdx = grep(removeExpr, allNames)\n  extractIdx = grep(extractTag, allNames)\n  \n  oldNames = allNames[-removeIdx]\n  newNames = gsub(paste0(sep, extractTag), '', allNames[extractIdx])\n  \n  \n  keepNames = setdiff(oldNames, newNames)\n  \n  for (iV in keepNames) {\n    dataOut[[iV]] = dataIn[[iV]]\n  }\n  \n  for (iV in newNames) {\n    dataOut[[iV]] = dataIn[[paste0(iV, sep, extractTag)]]\n  }\n  \n  return(dataOut)\n}",
+    "created" : 1496842262400.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3464390637",
+    "id" : "433FED8F",
+    "lastKnownWriteTime" : 1496844313,
+    "last_content_update" : 1496844313826,
+    "path" : "/media/neumannd/work_dell/88_MeRamo/64_validator_data_preparation/workflow/hbm_extract_stations/support/extract_tag_data.R",
+    "project_path" : "support/extract_tag_data.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

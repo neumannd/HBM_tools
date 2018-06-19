@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "fill_grid_data_base = function(grids, ncIds) {\n  \n  newGrids = grids\n  \n  for (iG in names(grids)) {\n    ncId = ncIds[[iG]]\n    iD = 'time'\n    jD = 'time'\n    newGrids[[iG]]$time$ntime = ncId$dim$time$len-1\n    newGrids[[iG]]$time$units = ncId$dim$time$units\n    newGrids[[iG]]$time$len = ncId$dim$time$len-1\n    newGrids[[iG]]$time$unlim = ncId$dim$time$unlim\n    newGrids[[iG]]$time$values = ncId$dim$time$vals[1:newGrids[[iG]]$time$len]\n    \n    for (iD in c('lon', 'lat', 'depth')) {\n      jD = ifelse(iD=='depth','z',iD)\n      newGrids[[iG]][[jD]]$values = ncId$dim[[iD]]$vals\n      newGrids[[iG]][[jD]]$unlim = ncId$dim[[iD]]$unlim\n      newGrids[[iG]][[jD]]$len = ncId$dim[[iD]]$len\n    }\n    \n    tmp_att = ncatt_get(ncId, 'depth', attname='positive')\n    if (tmp_att$hasatt) {\n      newGrids[[iG]]$z$positive = tmp_att$value\n      newGrids[[iG]]$z$negative = ifelse(tmp_att$value=='down','up','down')\n    } else {\n      tmp_att = ncatt_get(ncId, 'depth', attname='negative')\n      if (tmp_att$hasatt) {\n        newGrids[[iG]]$z$negative = tmp_att$value\n        newGrids[[iG]]$z$positive = ifelse(tmp_att$value=='down','up','down')\n      } else {\n        warning(paste0('Neither \"positive\" nor \"negative\" attributes set in file ', ncId$filename))\n      }\n    }\n    \n    newGrids[[iG]]$sed$negative = newGrids[[iG]]$z$negative\n    newGrids[[iG]]$sur$negative = newGrids[[iG]]$z$negative\n    \n    newGrids[[iG]]$sed$positive = newGrids[[iG]]$z$positive\n    newGrids[[iG]]$sur$positive = newGrids[[iG]]$z$positive\n    \n    newGrids[[iG]]$sed$values = c(newGrids[[iG]]$z$values[newGrids[[iG]]$z$len])\n    newGrids[[iG]]$sur$values = c(newGrids[[iG]]$z$values[1])\n  }\n  \n  return(newGrids)\n}",
+    "created" : 1496782795740.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "129767161",
+    "id" : "39C01E02",
+    "lastKnownWriteTime" : 1496783250,
+    "last_content_update" : 1496783250703,
+    "path" : "/media/neumannd/work_dell/88_MeRamo/64_validator_data_preparation/workflow/hbm_extract_stations/support/fill_grid_data_base.R",
+    "project_path" : "support/fill_grid_data_base.R",
+    "properties" : {
+    },
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

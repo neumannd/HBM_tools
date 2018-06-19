@@ -1,0 +1,26 @@
+variable;formula;unit;longname
+salin; salt                              ;g/kg   ;salinity
+temp ; pot_temp                          ;degC   ;temperature
+u    ; u                                 ;m/s    ;eastward current
+v    ; v                                 ;m/s    ;northward current
+chl  ; (t_lpp+t_spp+t_cya)*2.0*1e6       ;mg/m3  ;Chlorophyll-a concentration
+o2   ; t_o2*1e6*22.4/1000                ;ml/l   ;oxygen concentration
+h2s  ; t_h2s*1e6                         ;mmol/m3;hydrogen sulfide concentration
+tn   ; (t_lpp+t_spp+t_cya+t_don+t_nh4+t_no3+t_zoo+t_det_1+t_det_2+t_det_3+t_det_4+t_det_5+t_det_6)*1e6;mmol/m3;total nitrogen concentration
+no2n ; 0.0*t_no3                         ;mmol/m3;nitrite concentration
+no3n ; t_no3*1e6                         ;mmol/m3;nitrate concentration
+nh4n ; t_nh4*1e6                         ;mmol/m3;ammonium concentration
+din  ; (t_no3+t_nh4)*1e6                 ;mmol/m3;dissolved inorganic nitrogen concentration
+don  ; t_don*1e6                         ;mmol/m3;dissolved organic nitrogen concentration
+pon  ; (t_lpp+t_spp+t_cya+t_zoo+t_det_1+t_det_2+t_det_3+t_det_4+t_det_5+t_det_6)*1e6;mmol/m3;particulate organic nitrogen concentration
+tp   ; (t_po4+(t_lpp+t_spp+t_cya+t_zoo+1.5*(t_detp_1+t_detp_2+t_detp_3+t_detp_4+t_detp_5+t_detp_6))/16)*1e6;mmol/m3;total phosphorus concentration
+po4p ; t_po4*1e6                         ;mmol/m3;phosphate concentration
+pco2 ; 10.0*pco2                         ;µatm   ;CO2 partial pressure
+ph   ; pH                                ;1      ;pH value
+alk  ; t_alk*1e6                         ;mmol/m3;total alkalinity
+poc  ; (t_poc+106/16*(t_lpp+t_spp+t_cya+t_don+t_zoo+1.5*(t_det_1+t_det_2+t_det_3+t_det_4+t_det_5+t_det_6)))*1e6;mmol/m3;particulate organic carbon concentration
+mnspm; t_mow*1e6                         ;mmol/m3;suspended manganese concentration
+mndis; t_mn2*1e6                         ;mmol/m3;dissolved manganese concentration
+no23n; t_no3*1e6                         ;mmol/m3;nitrate plus nitrite concentration
+totoxy;t_o2*1e6*22.4/1000.0              ;ml/l;oxygen concentration
+sio4;  t_sil*1e6                         ;mmol/m3;silicate concentration

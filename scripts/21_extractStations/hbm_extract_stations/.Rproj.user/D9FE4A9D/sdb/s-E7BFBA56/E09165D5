@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "library('ncdf4')\nsource('support/hbm_constants.R')  \nsource('support/read_varlist.R')  \nsource('support/read_varmapping_L0L1.R')\nsource('support/generate_varmapping_L2L2.R')\nsource('support/createL1file.R')\nsource('support/createL2file.R')\nsource('support/get_basic_grid_data.R')\nsource('support/latlon2cell.R')\nsource('support/read_stations.R')\nsource('support/calculate_variable.R')\nsource('support/generate_filesnames.R')\nsource('support/open_files.R')\nsource('support/close_files.R')\nsource('support/fill_grid_data_base.R')\nsource('support/get_varmapping_L0Fi.R')\nsource('support/remap_variables_L0L1.R')\nsource('support/read_data_L0.R')\nsource('support/readL1file.R')\n\nreadL0=TRUE\ncalcL1=TRUE\nwriteL1=TRUE\nreadL1=FALSE\ncalcL2=TRUE\nwriteL2=TRUE\n\n\n# directories ----\nvarmappingFileName = '../control_files/variablemapping.csv'\nvarlistFileName = '../control_files/variablelist_neumannd2.csv'\n# stationsFileName = '/media/neumannd/work_dell/88_MeRamo/64_validator_data_preparation/test_stations.csv'\nstationsFileName = '../control_files/all_stations.csv'\noutdir = '../output'\ninDir = '/silod4/dneumann/HBM/RESULTS/EVALUATION'\n\n\n# get grid infos ----\nif (readL0) {\n  grids = get_basic_grid_data()\n}\n\n\n# generate files names and open files ----\nncFiles = list()\nfilenamePrefix = list('ERGOM'='p', 'HBM'='p')\nfilenameSuffix = list('ERGOM'='WORKB_merge_mean_2012_jan.nc', 'HBM'='WORKE_merge_mean_2012_jan.nc')\nfileTypes      = list('ERGOM'=c('biodat', 'bendat', 'chldat', 'light', 'secchidat'),\n                      'HBM' = c('t_file', 'z_file', 'c_file')) \nncFileNames   = generate_filesnames(grids, fileTypes, filenamePrefix, filenameSuffix)\n\n\n# read variable and station data ----\nvarmapping  = list()\nvarnames    = list()\nvarmapping  = append(varmapping, get_varmapping_L0Fi()) \nvarmapping  = append(varmapping, read_varmapping_L0L1(varmappingFileName))\nvarlist     = read_varlist(varlistFileName)\nvarnames$L0 = names(varmapping$L0Fi)\nvarnames$L1 = names(varmapping$L1L0)\nvarnames$L2 = names(varlist)\nvarmapping  = append(varmapping, generate_varmapping_L2L2(varnames$L2))\n\n\n# read L0 data ----\nif (readL0) {\n  ncFiles$L0 = open_files(ncFileNames)\n  grids      = fill_grid_data_base(grids, ncFiles$L0$biodat)\n  stations    = read_stations(stationsFileName, grids)\n  dataL0     = read_data_L0(stations, ncFiles$L0, varmapping, grids)\n}\n\n\n# remap L0 to L1 ----\nif (calcL1) {\n  dataL1 = remap_variables_L0L1(names(stations), varnames, varmapping, dataL0)\n}\n\n\n# write L1 data ----\nif (writeL1) {\n  ncFiles$L1 = createL1file(stations, varnames, varmapping, dataL1, outdir, grids)\n  ## TODO: write\n}\n\n\n# read L1 data ----\nif (readL1) {\n  print('Empty')\n}\n\n\n# calculate L2 data ----\nif (calcL2) {\n  dataL2 = list()\n  for(iVar in names(varlist)) {\n    dataL2[[iVar]] = list()\n    dataL2[[iVar]]$data = calculate_variable(varlist[[iVar]]$formula, dataL1)\n  }\n}\n\n\n# write L2 data ----\nif (writeL2) {\n  ncFiles$L2 = createL2file(stations, varnames, varlist, varmapping, dataL2, outdir, grids)\n}\n\n\n# close all netCDF files ----\nclose_files(ncFiles)\n",
+    "created" : 1495532254958.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "377904382",
+    "id" : "E09165D5",
+    "lastKnownWriteTime" : 1496739531,
+    "last_content_update" : 1496739531101,
+    "path" : "/media/neumannd/work_dell/88_MeRamo/64_validator_data_preparation/workflow/hbm_extract_stations/hbm_extract_stations.R",
+    "project_path" : "hbm_extract_stations.R",
+    "properties" : {
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

@@ -1,0 +1,6 @@
+name;path
+GETM NSBS2nm R-vHR031;/silod3/radtke/GETM/NSBS2nm/R-vHR031/for_validation/
+GETM MODAT2;/silod3/radtke/models_for_validation/MODAT2/for_validation/
+GETM MODAT 2017 50 layers;/silod3/radtke/models_for_validation/Ulf_GETM_1nm_2017_50layers/for_validation/
+MOM5_TEP_V01_R12;/silod3/radtke/models_for_validation/MOM5_TEP_V01_R12/for_validation/
+MOM3_fehmarnbelt;/silod3/radtke/models_for_validation/fehmarnbelt/for_validation/

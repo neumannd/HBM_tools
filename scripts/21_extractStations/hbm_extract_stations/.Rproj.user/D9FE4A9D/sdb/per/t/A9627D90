@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "remap_variables_L0L1 = function(stationnames, varnames, varmapping, dataL0) {\n  \n  dataL1 = list()\n  \n  for (iV in varnames$L1) {\n    # print(iV)\n    dataL1[[iV]] = list()\n    dataL1[[iV]]$data = list()\n    \n    #' temporary variables\n    oldVarName = varmapping$L1L0[[iV]]\n    \n    dataL1[[iV]]$attributes = dataL0[[oldVarName]]$attributes\n    \n    for (iS in stationnames) {\n      dataL1[[iV]]$data[[iS]] = dataL0[[oldVarName]]$data[[iS]]\n    }\n  }\n  \n  layHeight_L0='h'\n  layHeight_L1='lay_thknss'\n  depth_L1='depth'\n  \n  dataL1[[layHeight_L1]] = list('attributes'=dataL0[[layHeight_L0]]$attributes, 'data'=list())\n  dataL1[[depth_L1]] = list('attributes'=dataL0[[layHeight_L0]]$attributes, 'data'=list())\n  dataL1[[depth_L1]]$attributes$standard_name = 'depth'\n  dataL1[[depth_L1]]$attributes$long_name = 'depth'\n  for (iS in stationnames) {\n    tmp_dims = dim(dataL0[[layHeight_L0]]$data[[iS]])\n    nz = tmp_dims[3]\n    dataL1[[layHeight_L1]]$data[[iS]] = dataL0[[layHeight_L0]]$data[[iS]]\n    dataL1[[depth_L1]]$data[[iS]] = array(NA, dim = tmp_dims)\n    dataL1[[depth_L1]]$data[[iS]][,,1,] = dataL0[[layHeight_L0]]$data[[iS]][,,1,]\n    if (nz > 1) for (iZ in 2:nz) {\n      dataL1[[depth_L1]]$data[[iS]][,,iZ,] = dataL1[[depth_L1]]$data[[iS]][,,iZ-1,] + dataL0[[layHeight_L0]]$data[[iS]][,,iZ,]\n    }\n  }\n  \n  return(dataL1)\n}\n\n",
+    "created" : 1496505622751.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3082544191",
+    "id" : "A9627D90",
+    "lastKnownWriteTime" : 1496505787,
+    "last_content_update" : 1496505787731,
+    "path" : "/media/neumannd/work_dell/88_MeRamo/64_validator_data_preparation/workflow/hbm_extract_stations/support/remap_variables_L0L1.R",
+    "project_path" : "support/remap_variables_L0L1.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 6,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

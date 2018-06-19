@@ -1,0 +1,26 @@
+variable;formula;unit;longname
+salin; salt                              ;g/kg   ;salinity
+temp ; pot_temp                          ;degC   ;temperature
+u    ; u                                 ;m/s    ;eastward current
+v    ; v                                 ;m/s    ;northward current
+chl  ; d_chl*1e-3                        ;mg/m3  ;Chlorophyll-a concentration
+o2   ; t_o2*1e-6*22.391                  ;ml/l   ;oxygen concentration
+tn   ; (t_lpp+t_spp+t_cya+t_don+t_nh4+t_no3+t_zoo+t_det_1)*1e-3;mmol/m3;total nitrogen concentration
+no2n ; 0.0*t_no3*1e-3                    ;mmol/m3;nitrite concentration
+no3n ; t_no3*1e-3                        ;mmol/m3;nitrate concentration
+nh4n ; t_nh4*1e-3                        ;mmol/m3;ammonium concentration
+din  ; (t_no3+t_nh4)*1e-3                ;mmol/m3;dissolved inorganic nitrogen concentration
+don  ; t_don*1e-3                        ;mmol/m3;dissolved organic nitrogen concentration
+pon  ; (t_lpp+t_spp+t_cya+t_zoo+t_pzoo+t_det_1)*1e-3;mmol/m3;particulate organic nitrogen concentration
+tp   ; (t_po4+(t_lpp+t_spp+t_cya+t_zoo+t_det_1)/16)*1e-3;mmol/m3;total phosphorus concentration
+po4p ; t_po4*1e-3                        ;mmol/m3;phosphate concentration
+no23n; t_no3*1e-3                        ;mmol/m3;nitrate plus nitrite concentration
+totoxy;t_o2*2.24*1e-5                    ;ml/l;oxygen concentration
+sio4 ; t_sil*1e-3                        ;mmol/m3;silicate concentration
+depth; depth                             ;m      ;depth
+secchi;d_secchi                          ;m      ;secchi
+dia  ; t_lpp_river*1e-3                  ;mmol/m3;diatom concentration
+flag ; t_spp_river*1e-3                  ;mmol/m3;flagellate concentration
+cyano; t_cya_river*1e-3                  ;mmol/m3;cyano concentration
+mezoo; t_zoo_river*1e-3                  ;mmol/m3;meso zooplankton concentration
+mizoo; t_pzoo_river*1e-3                 ;mmol/m3;micro zooplankton concentration
